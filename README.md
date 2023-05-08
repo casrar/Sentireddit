@@ -13,6 +13,7 @@ A full stack app to provide sentiment analysis on stocks from Reddit data.
 - Create Cron job to call scraping logic
 - Write backend facing sentiment analysis API 
 - Create frontend facing API
+- Refactor if needed
 - ...
 - Deploy!
 
