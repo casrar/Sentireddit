@@ -8,12 +8,13 @@ A full stack app to provide sentiment analysis on stocks from Reddit data.
   - ~~Create route to get data from CW~~
   - Set up dotfile to store worker url
   - ~~Perform SA on data from CW and return when called~~
-- Set up SvelteKit, NodeJS/NextJS
-  - Dockerize
+- Write API gateway 
+  - Use Go/Gin
 - ~~Set up PocketBase~~
-- Create Cron job to call scraping logic
-- Write backend facing sentiment analysis API 
-- Create frontend facing API
+- Write Cron and Bash script to call scraping logic
+- Set up front-end 
+  - Use SvelteKit  
+- Dockerize! 
 - Refactor if needed
 - ...
 - Deploy!
