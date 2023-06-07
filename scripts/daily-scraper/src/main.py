@@ -1,6 +1,9 @@
 import requests 
 import urllib.parse
 import logging 
+import praw
+import json
+import time
 from dotenv import dotenv_values
 
 config = dotenv_values(".env")
@@ -28,6 +31,30 @@ for i in range(response['totalItems']):
 #print(data_sources)
 
 
+reddit = praw.Reddit(
+    client_id = config['CLIENT_ID'],
+    client_secret = config['CLIENT_SECRET'],
+    user_agent = config['USER_AGENT'],
+    ratelimit_seconds = config['RATELIMIT_SECONDS']
+)
+
+subreddit_name = 'fusion'
+keyword = 'retard'
+subreddit = reddit.subreddit(subreddit_name)
+comments = subreddit.comments(limit=None)
+count = 0
+
+all_comments = []
+for comment in comments:
+    count = count + 1
+    all_comments.append(comment.body)
+print(f'Total comments: {count}')
+
+file_path = str(time.time())
+file = open(file_path, 'w')
+json.dump(all_comments, file)
+file.close()
+
 ## iterate over every data source ##
 # for each kvp                                                                
 for data_source in data_sources:
@@ -36,38 +63,10 @@ for data_source in data_sources:
         'http://127.0.0.1:8090/api/collections/data/records?sort=-post_date&filter=((subreddit=\'{subreddit}\') %26%26 search_term=\'{search_term}\')'
         .format(subreddit=data_source[KEY], search_term=data_source[VALUE]), # do this better
         headers={'Authorization': auth_token}).json() 
-    print(response)
+    #print(response)
 
     timestamp = 0 
     # if 0/null start at asc from 0                                             
     if response['totalItems'] > 0:
         timestamp = response['items'][0]['post_date']        
     
-    # call cf worker with KVP and timestamp
-    response = requests.get(
-        config['CLOUDFLARE_URL'] + '?q={search_term}&subreddit={subreddit}&after={after}s'
-        .format(search_term=data_source[VALUE], subreddit=data_source[KEY], after=timestamp), # do this better
-        headers={'Authorization': auth_token})
-    print(response)
-    # while cf data != null
-        # update timestamp in db
-        # analyze data
-        # push data into db
-        # call cf worker with n
-
-# {
-#   "subreddit": "investing",
-#   "search_terms": [
-#     "msft",
-#     "aapl",
-#     "vti"
-#   ]
-# }
-
-# {
-#   "subreddit": "wallstreetbets",
-#   "search_terms": [
-#     "gme",
-#     "tsla"
-#   ]
-# }
