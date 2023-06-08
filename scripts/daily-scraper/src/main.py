@@ -39,25 +39,16 @@ reddit = praw.Reddit(
 )
 
 subreddit_name = 'fusion'
-keyword = 'fusion'
+keyword = 'grestersatne'
 subreddit = reddit.subreddit(subreddit_name)
-# comments = subreddit.search(query='fusion', sort='comments', time_filter='all')
-# count = 0
 
-# all_comments = []
-# for comment in comments:
-#     count = count + 1
-#     all_comments.append(comment.body)
-# print(f'Total comments: {count}')
+for submission in subreddit.search(query=keyword, sort='comments', time_filter='day'):
+    print(submission.title)
 
 # file_path = str(time.time())
 # file = open(file_path, 'w')
 # json.dump(all_comments, file)
 # file.close()
-
-for submission in subreddit.search(query='fusion', sort='comments', time_filter='all'):
-    print(submission.title)
-
 
 
 ## iterate over every data source ##
