@@ -38,12 +38,35 @@ reddit = praw.Reddit(
     ratelimit_seconds = config['RATELIMIT_SECONDS']
 )
 
-subreddit_name = 'fusion'
-keyword = 'grestersatne'
+subreddit_name = 'wallstreetbets'
+keyword = 'money'
 subreddit = reddit.subreddit(subreddit_name)
+submissions = []
 
 for submission in subreddit.search(query=keyword, sort='comments', time_filter='day'):
-    print(submission.title)
+    print(submission.permalink)
+    submissions.append(submission.comments)
+
+for comment_forest in submissions:
+    more_comments = comment_forest.replace_more(limit=None)
+    while len(more_comments) > 0:
+        try:
+            more_comments = comment_forest.replace_more(limit=None)
+            break
+        except PossibleExceptions:
+            print("Handling replace_more exception") # replace with logging
+            sleep(1)
+    comment_forest = comment_forest.list()
+    print(type(comment_forest))
+    print(type(submissions[2]))
+
+# for comment in submissions[2]:
+#     print(type(comment))
+#     if comment is type(praw.models.MoreComments):
+#         print('MORE COMMENT')
+
+# print(submissions[2])
+
 
 # file_path = str(time.time())
 # file = open(file_path, 'w')
