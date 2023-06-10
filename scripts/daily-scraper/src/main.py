@@ -4,6 +4,7 @@ import logging
 import praw
 import json
 import time
+from nltk.sentiment import SentimentIntensityAnalyzer
 from dotenv import dotenv_values
 
 config = dotenv_values(".env")
@@ -11,6 +12,8 @@ config = dotenv_values(".env")
 # constants
 KEY = 0
 VALUE = 1
+
+sia = SentimentIntensityAnalyzer()
 
 # error check and log
 response = requests.post(
@@ -80,6 +83,20 @@ for data_source in data_sources:
     total_comments = len(filtered_comments)
     for comment in filtered_comments: 
         if comment.body.find(keyword) != -1: # Edit logic to account for case sensitivity 
-            matches.append(comment.body)
+            matches.append(comment)
+            comment.sentiment_analysis = sia.polarity_scores(comment.body)
+
+    #loop over all matches
+    for match in matches:                 
+        data = {
+            'body': match.body, 
+            'post_id': match.id, 
+            'subreddit': subreddit_name, # subreddit and search term use what is stored in DB
+            'search_term': keyword, 
+            'post_date': match.created_utc, 
+            'sentiment': match.sentiment_analysis
+            }
+        response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=data, headers={'Authorization': auth_token}).json()
+    
 
     print(f'Found: {len(matches)} / {total_comments}')
