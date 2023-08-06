@@ -30,7 +30,8 @@ data_sources = []
 for i in range(response['totalItems']):
     data_sources.append(
         (response['items'][i]['subreddit'], 
-        response['items'][i]['search_term'])) 
+        response['items'][i]['search_term'],
+        response['items'][i]['id'])) 
 
 reddit = praw.Reddit(
     client_id = config['CLIENT_ID'],
@@ -44,6 +45,7 @@ for data_source in data_sources:
     print(data_source)
     subreddit_name = data_source[KEY]
     keyword = data_source[VALUE]
+    data_source_id = data_source[2]
     subreddit = reddit.subreddit(subreddit_name)
     submissions = []
 
@@ -62,7 +64,7 @@ for data_source in data_sources:
         submissions[i] = submissions[i].list()
 
     response = requests.get(
-        'http://127.0.0.1:8090/api/collections/data/records?sort=-post_date&filter=((subreddit=\'{subreddit}\') %26%26 search_term=\'{search_term}\')'
+        f"http://127.0.0.1:8090/api/collections/data/records?sort=-post_date&filter=(id=\'{data_source_id}\')"
         .format(subreddit=data_source[KEY], search_term=data_source[VALUE]), # do this better
         headers={'Authorization': auth_token}).json() 
 
@@ -91,8 +93,7 @@ for data_source in data_sources:
         data = {
             'body': match.body, 
             'post_id': match.id, 
-            'subreddit': subreddit_name, # subreddit and search term use what is stored in DB
-            'search_term': keyword, 
+            'data_source': data_source_id,
             'post_date': match.created_utc, 
             'sentiment': match.sentiment_analysis
             }
