@@ -11,6 +11,7 @@ A full stack app to provide sentiment analysis on stocks from Reddit data.
 - Dockerize! 
 - Refactor if needed
 - ...
-- Deploy!
+- Write guide for self hosting
+- Configure a start up script/management script
 
 
