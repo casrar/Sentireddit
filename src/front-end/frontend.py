@@ -1,6 +1,9 @@
 import streamlit as st
 import requests 
 from dotenv import dotenv_values
+import datetime
+from datetime import date
+import urllib.parse
 
 config = dotenv_values(".env")
 # error check and log
@@ -52,9 +55,6 @@ com_value = neg_value = neu_value = pos_value = 0
 if selectbox_submit:
     com_value, neg_value, neu_value, pos_value = get_data(selectbox_data)
 
-
-# TESTING
-
 response = requests.get(
     'http://127.0.0.1:8090/api/collections/data/records', 
     headers={'Authorization': auth_token}).json()
@@ -66,7 +66,24 @@ neu.metric('Neutral',neu_value)
 pos.metric('Positive',pos_value)
 
 date_input, graph = st.columns(2)
+#graph.line_chart(response['items'][0]['sentiment'])
 date_input.form('Date Range')
-start_date = date_input.date_input("start date")
-end_date = date_input.date_input("end date")
-graph.line_chart(response['items'][0]['sentiment'])
+
+start_date_input = date_input.date_input("start date")
+start_date = datetime.datetime(start_date_input.year, start_date_input.month, start_date_input.day)
+start_date = int(start_date.timestamp())
+
+end_date_input = date_input.date_input("end date")
+end_date = datetime.datetime(end_date_input.year, end_date_input.month, end_date_input.day)
+end_date = int(end_date.timestamp())
+if end_date < start_date:
+    st.warning('End Date is before Start Date.')
+else: 
+    base_url = 'http://127.0.0.1:8090/api/collections/data/records'
+    filter = f"(data_source=\'{selectbox_data['id']}\'&&post_date>\'{start_date}\'&&post_date<\'{end_date}\')"
+    response = requests.get(
+        url=base_url,
+        params= {'filter':filter}, 
+        headers={'Authorization': auth_token}).json()
+    print(response)
+
