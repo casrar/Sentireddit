@@ -66,7 +66,6 @@ neu.metric('Neutral',neu_value)
 pos.metric('Positive',pos_value)
 
 date_input, graph = st.columns(2)
-#graph.line_chart(response['items'][0]['sentiment'])
 date_input.form('Date Range')
 
 start_date_input = date_input.date_input("start date")
@@ -76,6 +75,7 @@ start_date = int(start_date.timestamp())
 end_date_input = date_input.date_input("end date")
 end_date = datetime.datetime(end_date_input.year, end_date_input.month, end_date_input.day)
 end_date = int(end_date.timestamp())
+sentiment_list = []
 if end_date < start_date:
     st.warning('End Date is before Start Date.')
 else: 
@@ -85,5 +85,8 @@ else:
         url=base_url,
         params= {'filter':filter}, 
         headers={'Authorization': auth_token}).json()
-    print(response)
+    for item in response['items']:
+        sentiment_list.append(item['sentiment'])
+    print(sentiment_list)
+    graph.line_chart(sentiment_list)
 
