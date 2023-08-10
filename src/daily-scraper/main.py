@@ -64,8 +64,7 @@ for data_source in data_sources:
         submissions[i] = submissions[i].list()
 
     response = requests.get(
-        f"http://127.0.0.1:8090/api/collections/data/records?sort=-post_date&filter=(id=\'{data_source_id}\')"
-        .format(subreddit=data_source[KEY], search_term=data_source[VALUE]), # do this better
+        f"http://127.0.0.1:8090/api/collections/data/records?sort=-post_date&filter=(data_source=\'{data_source_id}\')", # do this better
         headers={'Authorization': auth_token}).json() 
 
     timestamp = 0 
