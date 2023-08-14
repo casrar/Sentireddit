@@ -2,8 +2,10 @@ import streamlit as st
 import requests 
 from dotenv import dotenv_values
 import datetime
-from datetime import date
+from datetime import date, datetime as dt
 import urllib.parse
+import plotly.express as px
+import pandas as pd
 
 config = dotenv_values(".env")
 # error check and log
@@ -37,7 +39,10 @@ def get_data(data_source):
     response = requests.get(
         f"http://127.0.0.1:8090/api/collections/data/records?filter=(data_source=\'{data_source['id']}\')", 
         headers={'Authorization': auth_token}).json()
-    item_count = response['totalItems']
+    item_count = response['totalItems'] 
+    if item_count < 1:
+        st.warning('No data exists for selected Data Source.')
+        return com_value, neg_value, neu_value, pos_value
     for item in response['items']:
         com_value += item['sentiment']['compound']
         neg_value += item['sentiment']['neg']
@@ -86,7 +91,9 @@ else:
         params= {'filter':filter}, 
         headers={'Authorization': auth_token}).json()
     for item in response['items']:
-        sentiment_list.append(item['sentiment'])
-    print(sentiment_list)
-    graph.line_chart(sentiment_list)
+        sentiment_list.append(item['sentiment']['compound'])
+    fig = px.violin(pd.DataFrame(sentiment_list, columns=['Sentiment']), y='Sentiment', points='all')
+    graph.plotly_chart(fig, theme='streamlit', use_container_width=True)
+
+
 
