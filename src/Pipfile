@@ -9,6 +9,7 @@ python-dotenv = "*"
 praw = "*"
 nltk = "*"
 streamlit = "*"
+plotly = "*"
 
 [dev-packages]
 
