@@ -10,6 +10,7 @@ praw = "*"
 nltk = "*"
 streamlit = "*"
 plotly = "*"
+pandas = "*"
 
 [dev-packages]
 
