@@ -55,10 +55,18 @@ def get_data(data_source):
     return com_value, neg_value, neu_value, pos_value
 select_data_source = st.form('select_data_sources')
 selectbox_data = select_data_source.selectbox(label='Choose Data Source:', options=response['items'], format_func=format_selections)
-selectbox_submit = select_data_source.form_submit_button('Change Data Source')
+selectbox_submit, selectbox_remove = select_data_source.columns(2)
+selectbox_submit.form_submit_button('Change Data Source')
+selectbox_remove.form_submit_button('Remove Data Source')
 com_value = neg_value = neu_value = pos_value = 0
 if selectbox_submit:
     com_value, neg_value, neu_value, pos_value = get_data(selectbox_data)
+if selectbox_remove:
+    base_url = f"http://127.0.0.1:8090/api/collections/data_source/records/{selectbox_data['id']}"
+    response = requests.delete(
+        url=base_url, 
+        headers={'Authorization': auth_token}).json()
+    print(response)
 
 response = requests.get(
     'http://127.0.0.1:8090/api/collections/data/records', 
