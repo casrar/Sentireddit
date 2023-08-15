@@ -7,10 +7,11 @@ A full stack app to provide sentiment analysis on stocks from Reddit data.
   - ~~refcator to use PRAW~~
 - Write Cron and Bash script to call scraping logic
 - Set up front-end 
-  - Use SvelteKit  
+  - Use Streamlit  
 - Dockerize! 
 - Refactor if needed
 - ...
-- Deploy!
+- Write guide for self hosting
+- Configure a start up script/management script
 
 
