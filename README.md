@@ -13,7 +13,7 @@ A full stack app to provide sentiment analysis on stocks from Reddit data.
 - Clean up comments
 - Prefer logging
 - Refactor (var names, file names, logic, etc)
-...  
+- ...  
 - Create config script
 - Look into faster ways of searching, either web scraping or .info method (from PRAW)
 - Research Docker
