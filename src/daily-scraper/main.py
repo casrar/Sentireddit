@@ -46,12 +46,12 @@ for data_source in data_sources:
     subreddit_name = data_source[KEY]
     keyword = data_source[VALUE]
     data_source_id = data_source[2]
-    subreddit = reddit.subreddit(subreddit_name)
+    subreddit = reddit.subreddit(subreddit_name) # if subreddit does not exist, breaking error
     submissions = []
 
-    for submission in subreddit.search(query=keyword, sort='comments', time_filter='day'):
+    for submission in subreddit.search(query=keyword, sort='comments', time_filter='day'): # set to day, testing all
         submissions.append(submission.comments)
-
+    
     for i in range(len(submissions)):
         more_comments = submissions[i].replace_more(limit=None)
         while len(more_comments) > 0:
@@ -68,17 +68,18 @@ for data_source in data_sources:
         headers={'Authorization': auth_token}).json() 
 
     timestamp = 0 
-    if response['totalItems'] > 0:
+    if response['totalItems'] > 0:  
         timestamp = response['items'][0]['post_date']  
 
     filtered_comments = []
     new_timestamp = timestamp
     for comment_list in submissions: # Not ideal, but can be refactored
-        for comment in comment_list:
+        for comment in comment_list: 
             if comment.created_utc > timestamp: 
-                filtered_comments.append(comment)
+                filtered_comments.append(comment)   
             if comment.created_utc > new_timestamp:
                 new_timestamp = comment.created_utc
+            
 
     matches = []
     total_comments = len(filtered_comments)
@@ -98,5 +99,4 @@ for data_source in data_sources:
             }
         response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=data, headers={'Authorization': auth_token}).json()
     
-
     print(f'Found: {len(matches)} / {total_comments}')
