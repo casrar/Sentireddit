@@ -21,6 +21,10 @@ if 'data_source_length' not in st.session_state:
     st.session_state['data_source_length'] = response['totalItems']
     st.session_state['data_source_list'] = []
 
+if 'sentiment' not in st.session_state:
+    st.session_state['sentiment'] = {'compound': 0, 'neg': 0, 'neu': 0, 'pos': 0}
+
+
 st.write("Reddit Sentiment Analysis")
 
 data_source = st.form('add_data_sources')
@@ -43,7 +47,7 @@ response = requests.get(
 def format_selections(data_source):
     return f'{data_source["subreddit"]}:{data_source["search_term"]}'
 def get_data(data_source):
-    com_value = neg_value = neu_value =pos_value = 0
+    com_value = neg_value = neu_value = pos_value = 0
     response = requests.get(
         f"http://127.0.0.1:8090/api/collections/data/records?filter=(data_source=\'{data_source['id']}\')", 
         headers={'Authorization': auth_token}).json()
@@ -60,7 +64,7 @@ def get_data(data_source):
     neg_value = neg_value / item_count
     neu_value = neu_value / item_count
     pos_value = pos_value / item_count
-    return com_value, neg_value, neu_value, pos_value
+    return {'compound': com_value, 'neg': neg_value, 'neu': neu_value, 'pos': pos_value}
 
 with st.form('select_data_sources', clear_on_submit=True):
     st.session_state['data_source_list'] = response['items']
@@ -68,7 +72,8 @@ with st.form('select_data_sources', clear_on_submit=True):
     selectbox_submit = st.form_submit_button('Change Data Source') 
     selectbox_remove = st.form_submit_button('Remove Data Source')
     if selectbox_submit and st.session_state['data_source_length'] > 0:
-        com_value, neg_value, neu_value, pos_value = get_data(selectbox_data)
+        st.session_state['sentiment'] = {'compound': 0, 'neg': 0, 'neu': 0, 'pos': 0}
+        st.session_state['sentiment'] = get_data(selectbox_data)
     elif selectbox_remove and st.session_state['data_source_length'] > 0:
         base_url = f"http://127.0.0.1:8090/api/collections/data_source/records/{selectbox_data['id']}"
         response = requests.delete(
@@ -84,10 +89,11 @@ response = requests.get(
     headers={'Authorization': auth_token}).json()
 
 com, neg, neu, pos = st.columns(4)
-com.metric('Compound',com_value)
-neg.metric('Negative', neg_value)
-neu.metric('Neutral',neu_value)
-pos.metric('Positive',pos_value)
+if selectbox_data is not None:
+    com.metric('Compound', st.session_state['sentiment']['compound'])
+    neg.metric('Negative', st.session_state['sentiment']['neg'])
+    neu.metric('Neutral', st.session_state['sentiment']['neu'])
+    pos.metric('Positive', st.session_state['sentiment']['pos'])
 
 date_input, graph = st.columns(2)
 date_input.form('Date Range')
@@ -100,9 +106,9 @@ end_date_input = date_input.date_input("end date")
 end_date = datetime.datetime(end_date_input.year, end_date_input.month, end_date_input.day)
 end_date = int(end_date.timestamp())
 sentiment_list = []
-if end_date < start_date:
+if end_date < start_date and selectbox_data is not None:
     st.warning('End Date is before Start Date.')
-else: 
+elif selectbox_data is not None: 
     base_url = 'http://127.0.0.1:8090/api/collections/data/records'
     filter = f"(data_source=\'{selectbox_data['id']}\'&&post_date>\'{start_date}\'&&post_date<\'{end_date}\')"
     response = requests.get(
