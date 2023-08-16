@@ -10,6 +10,7 @@ A self hostable full stack app to provide sentiment analysis Reddit data.
   - Multipage (Intro, Data Source Management, Data Analysis)
   - ~~Method to remove datasources~~
     - Fix bug where data source remains in selectbox after deletion
+    - Fix index out of range bug when deleting last item in list
     - Rework logic to reduce coupling (~~ex: sentiment values error if nothing selected~~)
   - Method to call scraping logic from frontend
   - Better analysis tools
