@@ -15,7 +15,10 @@ response = requests.post(
 auth_token = response['token']
 
 if 'data_source_length' not in st.session_state:
-    st.session_state['data_source_length'] = 0
+    response = requests.get(
+        f"http://127.0.0.1:8090/api/collections/data_source/records", 
+        headers={'Authorization': auth_token}).json()
+    st.session_state['data_source_length'] = response['totalItems']
     st.session_state['data_source_list'] = []
 
 st.write("Reddit Sentiment Analysis")
