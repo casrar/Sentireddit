@@ -14,6 +14,9 @@ response = requests.post(
     data={'identity': config['IDENTITY'], 'password': config['PASSWORD']}).json()
 auth_token = response['token']
 
+if 'data_source_length' not in st.session_state:
+    st.session_state['data_source_length'] = 0
+    st.session_state['data_source_list'] = []
 
 st.write("Reddit Sentiment Analysis")
 
@@ -27,6 +30,8 @@ if data_source_submit:
             'search_term': search_term,
             }
     response = requests.post('http://127.0.0.1:8090/api/collections/data_source/records', json=data, headers={'Authorization': auth_token}).json()
+    st.session_state['data_source_length'] += 1
+
 
 response = requests.get(
     'http://127.0.0.1:8090/api/collections/data_source/records', 
@@ -53,20 +58,23 @@ def get_data(data_source):
     neu_value = neu_value / item_count
     pos_value = pos_value / item_count
     return com_value, neg_value, neu_value, pos_value
-select_data_source = st.form('select_data_sources')
-selectbox_data = select_data_source.selectbox(label='Choose Data Source:', options=response['items'], format_func=format_selections)
-selectbox_submit, selectbox_remove = select_data_source.columns(2)
-selectbox_submit.form_submit_button('Change Data Source')
-selectbox_remove.form_submit_button('Remove Data Source')
-com_value = neg_value = neu_value = pos_value = 0
-if selectbox_submit:
-    com_value, neg_value, neu_value, pos_value = get_data(selectbox_data)
-if selectbox_remove:
-    base_url = f"http://127.0.0.1:8090/api/collections/data_source/records/{selectbox_data['id']}"
-    response = requests.delete(
-        url=base_url, 
-        headers={'Authorization': auth_token}).json()
-    print(response)
+
+with st.form('select_data_sources', clear_on_submit=True):
+    st.session_state['data_source_list'] = response['items']
+    selectbox_data = st.selectbox(label='Choose Data Source:', options=st.session_state['data_source_list'], format_func=format_selections)
+    selectbox_submit = st.form_submit_button('Change Data Source') 
+    selectbox_remove = st.form_submit_button('Remove Data Source')
+    if selectbox_submit and st.session_state['data_source_length'] > 0:
+        com_value, neg_value, neu_value, pos_value = get_data(selectbox_data)
+    elif selectbox_remove and st.session_state['data_source_length'] > 0:
+        base_url = f"http://127.0.0.1:8090/api/collections/data_source/records/{selectbox_data['id']}"
+        response = requests.delete(
+            url=base_url, 
+            headers={'Authorization': auth_token})
+        st.session_state['data_source_length'] -= 1
+        st.session_state['data_source_list'].remove(selectbox_data)
+    elif selectbox_remove and st.session_state['data_source_length'] < 1:
+        st.warning('No Data Sources exist.')
 
 response = requests.get(
     'http://127.0.0.1:8090/api/collections/data/records', 
