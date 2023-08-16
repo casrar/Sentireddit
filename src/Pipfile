@@ -8,9 +8,9 @@ requests = "*"
 python-dotenv = "*"
 praw = "*"
 nltk = "*"
-streamlit = "*"
 plotly = "*"
 pandas = "*"
+flask = "*"
 
 [dev-packages]
 
