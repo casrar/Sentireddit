@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 import requests 
 from dotenv import dotenv_values
 import datetime
@@ -17,5 +17,5 @@ auth_token = response['token']
 app = Flask(__name__)
 
 @app.route('/')
-def hello_world():
-    return '<p>Hello, World!</p>'
+def index():
+    return render_template('index.html')
