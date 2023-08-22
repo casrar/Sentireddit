@@ -19,3 +19,15 @@ app = Flask(__name__)
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/about')
+def about():
+    return render_template('index.html')
+
+@app.route('/data_management')
+def data_management():
+    return render_template('data_management.html')
+
+@app.route('/analytics')
+def analytics():
+    return render_template('analytics.html')
