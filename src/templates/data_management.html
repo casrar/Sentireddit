@@ -7,7 +7,29 @@
 {{ super() }}
 {% endblock %}
 {% block content %}
-
+<div class="flex flex-row">
+    <!-- Data Source Section -->
+    <div> 
+        <h3>Manage Data Sources</h3>
+        <form>
+            <label for="subreddit"></label>
+            <input type="text" id="subreddit" name="subreddit">
+            <label for="searchterm"></label>
+            <input type="text" id="searchterm" name="searchterm">
+            <input type="submit" value="Submit">
+        </form>
+        <div>
+            <!-- {{ context['data_sources']}} -->
+        </div>
+    </div>
+    <!-- Data Section -->
+    <div>
+        <h3>Manage Data</h3>
+        <div>
+            <!-- {{ context['data']}} -->
+        </div>
+    </div>
+</div>
 {% endblock %}
 {% block footer %}
 {{ super() }}

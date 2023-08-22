@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import requests 
 from dotenv import dotenv_values
 import datetime
@@ -16,17 +16,26 @@ auth_token = response['token']
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/',methods=['GET'])
 def index():
     return render_template('index.html')
 
-@app.route('/about')
+@app.route('/about', methods=['GET'])
 def about():
     return render_template('index.html')
 
-@app.route('/data_management')
+@app.route('/data_management', methods=['POST', 'GET'])
 def data_management():
-    return render_template('data_management.html')
+    response = requests.get('http://127.0.0.1:8090/api/collections/data_source/records').json() 
+    context = {}
+    context['data_sources'] = response['items']
+    response = requests.get('http://127.0.0.1:8090/api/collections/data/records').json() 
+    context['data'] = response['items']
+
+    if request.method == 'POST':
+        print('post')
+
+    return render_template('data_management.html', context=context)
 
 @app.route('/analytics')
 def analytics():
