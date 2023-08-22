@@ -2,15 +2,24 @@
 <html lang="en">
 <head>
     {% block head %}
+    <link rel="stylesheet" href="static/style.css" />
     {% endblock %}
 </head>
 <body>
+    <div id="navigation">
+        {% block navigation %}
+        <a href="/about">About</a>
+        <a href="/data_management">Data Management</a>        
+        <a href="/analytics">Analytics</a>
+        {% endblock %}
+    </div>
     <div id="content">
         {% block content %}
         {% endblock %}
     </div>
     <div id="footer">
         {% block footer %}
+        <p>Sentireddit</p>
         {% endblock %}
     </div>
 </body>
