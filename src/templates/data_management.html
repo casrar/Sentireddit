@@ -7,23 +7,30 @@
 {{ super() }}
 {% endblock %}
 {% block content %}
-<div class="flex flex-row">
+<div class="columns-2 max-h-96">
     <!-- Data Source Section -->
-    <div> 
-        <h3>Manage Data Sources</h3>
-        <form>
-            <label for="subreddit"></label>
-            <input type="text" id="subreddit" name="subreddit">
-            <label for="searchterm"></label>
-            <input type="text" id="searchterm" name="searchterm">
-            <input type="submit" value="Submit">
-        </form>
+    <div class="container mx-auto border flex flex-col"> 
         <div>
+            <h3>Manage Data Sources</h3>
+        </div>
+        <div>
+            <form>
+                <label for="subreddit"></label>
+                <input class="border" type="text" id="subreddit" name="subreddit">
+                <label for="searchterm"></label>
+                <input class="border type="text" id="searchterm" name="searchterm">
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        <div class="overflow-y-auto">
+            {% for item in context['data_sources'] %}
+                <div>{{ item }}</div>
+            {% endfor %}
             <!-- {{ context['data_sources']}} -->
         </div>
     </div>
     <!-- Data Section -->
-    <div>
+    <div class="container mx-auto border flex flex-col">
         <h3>Manage Data</h3>
         <div>
             <!-- {{ context['data']}} -->
