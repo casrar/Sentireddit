@@ -33,11 +33,21 @@ def data_management():
     context['data'] = response['items']
 
     if request.method == 'POST' and request.form['form-id'] == 'add-data-source':
-        print(request.form)
-    if request.method == 'POST' and request.form['form-id'] == 'remove-data':
-        print(request.form)
+        data = {
+            'subreddit': request.form['subreddit'],
+            'search_term': request.form['search-term']
+        }
+        response = requests.post('http://127.0.0.1:8090/api/collections/data_source/records',
+                                 json=data).json() 
     if request.method == 'POST' and request.form['form-id'] == 'remove-data-source':
-        print(request.form) 
+        selected_data = request.form.getlist('selected-data')
+        for data in selected_data:
+            response = requests.delete(f'http://127.0.0.1:8090/api/collections/data_source/records/{data}')
+    if request.method == 'POST' and request.form['form-id'] == 'remove-data':
+        selected_data = request.form.getlist('selected-data')
+        for data in selected_data:
+            response = requests.delete(f'http://127.0.0.1:8090/api/collections/data/records/{data}')
+   
 
     return render_template('data_management.html', context=context)
 
