@@ -32,8 +32,12 @@ def data_management():
     response = requests.get('http://127.0.0.1:8090/api/collections/data/records').json() 
     context['data'] = response['items']
 
-    if request.method == 'POST':
-        print('post')
+    if request.method == 'POST' and request.form['form-id'] == 'add-data-source':
+        print(request.form)
+    if request.method == 'POST' and request.form['form-id'] == 'remove-data':
+        print(request.form)
+    if request.method == 'POST' and request.form['form-id'] == 'remove-data-source':
+        print(request.form) 
 
     return render_template('data_management.html', context=context)
 

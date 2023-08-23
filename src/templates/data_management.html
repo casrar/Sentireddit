@@ -7,14 +7,15 @@
 {{ super() }}
 {% endblock %}
 {% block content %}
-<div class="columns-2 max-h-96">
+<div class="grid grid-cols-2">
     <!-- Data Source Section -->
-    <div class="container mx-auto border flex flex-col"> 
+    <div class="border flex flex-col"> 
         <div>
             <h3>Manage Data Sources</h3>
         </div>
         <div>
-            <form>
+            <form action="/data_management" method="POST">
+                <input type="hidden" name="form-id" value="data-sources">
                 <label for="subreddit"></label>
                 <input class="border" type="text" id="subreddit" name="subreddit">
                 <label for="searchterm"></label>
@@ -22,19 +23,39 @@
                 <input type="submit" value="Submit">
             </form>
         </div>
-        <div class="overflow-y-auto">
-            {% for item in context['data_sources'] %}
-                <div>{{ item }}</div>
-            {% endfor %}
-            <!-- {{ context['data_sources']}} -->
-        </div>
+        <form action="/data_management" method="POST">
+            <input type="hidden" name="form-id" value="remove-data-source">
+            <div class="max h-16 overflow-y-auto">
+                {% for item in context['data_sources'] %}
+                    <label>
+                        <input type="checkbox" name="selected-data" value="{{ item.id }}"><input/>
+                        {{ item['search_term'] }}
+                        {{ item['subreddit']}}
+                    </label>
+                    <br/>
+                {% endfor %}
+            </div>
+            <input type="submit" value="Submit">
+        </form>
     </div>
     <!-- Data Section -->
-    <div class="container mx-auto border flex flex-col">
+    <div class="border flex flex-col">
         <h3>Manage Data</h3>
-        <div>
-            <!-- {{ context['data']}} -->
-        </div>
+        <form action="/data_management" method="POST">
+            <input type="hidden" name="form-id" value="remove-data">
+            <div class="max h-16 overflow-y-auto">
+                {% for item in context['data'] %}
+                    <label>
+                        <input type="checkbox" name="selected-data" value="{{ item.id }}"><input/>
+                        {{ item['body'] }}
+                        {{ item['sentiment'] }}
+                        {{ item['data_source'] }}
+                    </label>
+                    <br/>
+                {% endfor %}
+            </div>
+            <input type="submit" value="Submit">
+        </form>
     </div>
 </div>
 {% endblock %}
