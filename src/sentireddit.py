@@ -53,4 +53,8 @@ def data_management():
 
 @app.route('/analytics')
 def analytics():
-    return render_template('analytics.html')
+    context = {}
+    data = {'x': [1, 2, 3, 4], 'y': [10, 11, 9, 12], 'type': 'violin', 'mode': 'markers'}
+    layout = {'title': 'My Plot'}
+    chart_data = {'data': [data], 'layout': layout}
+    return render_template('analytics.html', chart_data=chart_data)

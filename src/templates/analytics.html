@@ -1,14 +1,44 @@
 {% extends "base.html" %}
-{% block title %}About{% endblock %}
 {% block head %}
 {{ super() }}
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 {% endblock %}
 {% block navigation %}
 {{ super() }}
 {% endblock %}
 {% block content %}
-
-
+<div class="grid grid-cols-2">
+    <div class="flex flex-col">
+        <div>
+            <form>
+                <input type="hidden" name="form-id" value="select-date">
+                <input type="date" name="first-date" required/>
+                <input type="date" name="second-date" required/>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+        <div id="plotly-chart"></div>
+    </div>
+    <div class="flex flex-col">
+        <div class="grid grid-cols-4">
+            <div>compound</div>
+            <div>pos</div>
+            <div>neu</div>
+            <div>neg</div>
+        </div>
+        <div>
+            summary
+        </div>
+        <div class="grid grid-cols-2">
+            <div>best</div>
+            <div>worst</div>
+        </div>
+    </div>
+</div>
+<script>
+    var chart_data = {{ chart_data | tojson | safe }};
+    Plotly.newPlot('plotly-chart', chart_data['data'], chart_data['layout']);
+</script>
 {% endblock %}
 {% block footer %}
 {{ super() }}
