@@ -114,8 +114,7 @@ def analytics():
                                 params=params,
                                 headers={'Authorization': auth_token}).json() 
         items = response['items']
-        print(items)
-        context['most_positive_post'] = items[0]['body']
+        context['most_positive_post'] = items[0]['body'] if items else 'N/A'
         params = {
             'sort': '+neg',
             'perPage': '1',
@@ -125,7 +124,7 @@ def analytics():
                                 params=params,
                                 headers={'Authorization': auth_token}).json() 
         items = response['items']
-        context['most_negative_post'] = items[0]['body']
+        context['most_negative_post'] = items[0]['body'] if items else 'N/A'
         
         print(context)
 
