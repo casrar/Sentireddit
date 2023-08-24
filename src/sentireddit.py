@@ -26,8 +26,8 @@ def about():
 
 @app.route('/data_management', methods=['POST', 'GET'])
 def data_management():
-    response = requests.get('http://127.0.0.1:8090/api/collections/data_source/records').json() 
     context = {}
+    response = requests.get('http://127.0.0.1:8090/api/collections/data_source/records').json() 
     context['data_sources'] = response['items']
     response = requests.get('http://127.0.0.1:8090/api/collections/data/records').json() 
     context['data'] = response['items']
@@ -51,10 +51,14 @@ def data_management():
 
     return render_template('data_management.html', context=context)
 
-@app.route('/analytics')
+@app.route('/analytics', methods=['POST', 'GET'])
 def analytics():
     context = {}
+    response = requests.get('http://127.0.0.1:8090/api/collections/data_source/records').json() 
+
+    context['data_sources'] = response['items']
     data = {'x': [1, 2, 3, 4], 'y': [10, 11, 9, 12], 'type': 'violin', 'mode': 'markers'}
     layout = {'title': 'My Plot'}
     chart_data = {'data': [data], 'layout': layout}
-    return render_template('analytics.html', chart_data=chart_data)
+
+    return render_template('analytics.html', context=context, chart_data=chart_data)

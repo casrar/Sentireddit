@@ -11,6 +11,18 @@
     <div class="flex flex-col">
         <div>
             <form>
+                <input type="hidden" name="form-id" value="select-data-source">
+                <select name="data-source-selection" id="data-source-selection"> 
+                    {% for item in context['data_sources'] %}
+                        <option value="{{ item['id'] }}">
+                            {{ item['search_term'] }}
+                            {{ item['subreddit']}}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+        <div>
+            <form>
                 <input type="hidden" name="form-id" value="select-date">
                 <input type="date" name="first-date" required/>
                 <input type="date" name="second-date" required/>
