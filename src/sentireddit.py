@@ -6,6 +6,32 @@ from datetime import date, datetime as dt
 import urllib.parse
 import plotly.express as px
 import pandas as pd
+from statistics import mean 
+
+def calculate_average_sentiments(items):
+    avg_compound = avg_pos = avg_neu = avg_neg = 0 
+    if len(items) < 1:
+        return avg_compound, avg_pos, avg_neu, avg_neg
+    compound_list, pos_list, neu_list, neg_list = [], [], [], []
+    for item in items:
+        compound_list.append(item['compound'])
+        pos_list.append(item['pos'])
+        neu_list.append(item['neu'])
+        neg_list.append(item['neg'])
+    # print(compound_list)
+    # print(neg_list)
+    return mean(compound_list), mean(pos_list), mean(neu_list), mean(neg_list), 
+
+# def sentiment_observation(items):
+#     # data appears to be overwhelmingly positive
+#     # data appears to be very positive
+#     # data appears to be slightly
+#     # data appears to be neutral
+#     # data appears to be slightly negative
+#     # data appears to be very negative
+#     # data appears to be overwhelmingly negative
+#     # data appears to be mixed 
+
 
 config = dotenv_values(".env")
 # error check and log
@@ -55,10 +81,60 @@ def data_management():
 def analytics():
     context = {}
     response = requests.get('http://127.0.0.1:8090/api/collections/data_source/records').json() 
-
-    context['data_sources'] = response['items']
-    data = {'x': [1, 2, 3, 4], 'y': [10, 11, 9, 12], 'type': 'violin', 'mode': 'markers'}
-    layout = {'title': 'My Plot'}
+    data = {'x': 'compound list', 'y': [], 'type': 'violin', 'mode': 'markers'}
+    layout = {'title': 'Compound'}
     chart_data = {'data': [data], 'layout': layout}
+    context['data_sources'] = response['items']
+    if request.method == 'POST' and request.form['form-id'] == 'select-data-source':
+        first_date = int (dt.strptime(request.form['first-date'], '%Y-%m-%d').timestamp())
+        second_date = int (dt.strptime(request.form['second-date'], '%Y-%m-%d').timestamp())
+        params = {
+            'filter': f'(data_source=\'{request.form["data-source-selection"]}\' && post_date >= {first_date} && post_date <= {second_date})'
+        }
+        response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
+                                params=params,
+                                headers={'Authorization': auth_token}).json() 
+        items = response['items']
+
+        context['avg_compound'], context['avg_pos'], context['avg_neu'], context['avg_neg'] = calculate_average_sentiments(items)
+
+        compound_list = []
+        for item in items:
+            compound_list.append(item['compound'])
+        data = {'x': 'compound list', 'y': compound_list, 'type': 'violin', 'mode': 'markers'}
+        layout = {'title': 'Compound'}
+        chart_data = {'data': [data], 'layout': layout}
+
+        params = {
+            'sort': '-pos',
+            'perPage': '1',
+            'filter': f'(data_source=\'{request.form["data-source-selection"]}\' && post_date >= {first_date} && post_date <= {second_date})'
+        }
+        response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
+                                params=params,
+                                headers={'Authorization': auth_token}).json() 
+        items = response['items']
+        print(items)
+        context['most_positive_post'] = items[0]['body']
+        params = {
+            'sort': '+neg',
+            'perPage': '1',
+            'filter': f'(data_source=\'{request.form["data-source-selection"]}\' && post_date >= {first_date} && post_date <= {second_date})'
+        }
+        response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
+                                params=params,
+                                headers={'Authorization': auth_token}).json() 
+        items = response['items']
+        context['most_negative_post'] = items[0]['body']
+        
+        print(context)
+
+        # get all data in date range,
+        # get avg sentiment
+        # get top sentiment
+        # get worst sentiment
+        # create graph
+        # response = requests.get('http://127.0.0.1:8090/api/collections/data_source/records').json() 
 
     return render_template('analytics.html', context=context, chart_data=chart_data)
+

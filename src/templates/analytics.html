@@ -10,7 +10,7 @@
 <div class="grid grid-cols-2">
     <div class="flex flex-col">
         <div>
-            <form>
+            <form action="/analytics" method="POST">
                 <input type="hidden" name="form-id" value="select-data-source">
                 <select name="data-source-selection" id="data-source-selection"> 
                     {% for item in context['data_sources'] %}
@@ -18,32 +18,30 @@
                             {{ item['search_term'] }}
                             {{ item['subreddit']}}</option>
                     {% endfor %}
-                </select>
-            </form>
-        </div>
-        <div>
-            <form>
-                <input type="hidden" name="form-id" value="select-date">
-                <input type="date" name="first-date" required/>
-                <input type="date" name="second-date" required/>
-                <input type="submit" value="Submit">
+                </select>     
+                <div>           
+                    <input type="hidden" name="form-id" value="select-date">
+                    <input type="date" name="first-date" required/>
+                    <input type="date" name="second-date" required/>
+                    <input type="submit" value="Submit">
+                </div>
             </form>
         </div>
         <div id="plotly-chart"></div>
     </div>
     <div class="flex flex-col">
         <div class="grid grid-cols-4">
-            <div>compound</div>
-            <div>pos</div>
-            <div>neu</div>
-            <div>neg</div>
+            <div>average compound: {{ context['avg_compound'] }}</div>
+            <div>average pos: {{ context['avg_pos'] }}</div>
+            <div>average neu: {{ context['avg_neu'] }}</div>
+            <div>average neg: {{ context['avg_neg'] }}</div>
         </div>
         <div>
             summary
         </div>
         <div class="grid grid-cols-2">
-            <div>best</div>
-            <div>worst</div>
+            <div>{{ context['most_positive_post'] }}</div>
+            <div>{{ context['most_negative_post'] }}</div>
         </div>
     </div>
 </div>

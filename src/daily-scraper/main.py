@@ -95,7 +95,6 @@ for data_source in data_sources:
             'post_id': match.id, 
             'data_source': data_source_id,
             'post_date': match.created_utc, 
-            'sentiment': match.sentiment_analysis,
             'compound': match.sentiment_analysis['compound'],
             'pos': match.sentiment_analysis['pos'],
             'neu': match.sentiment_analysis['neu'],
