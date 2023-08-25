@@ -101,7 +101,8 @@ def analytics():
         compound_list = []
         for item in items:
             compound_list.append(item['compound'])
-        data = {'x': 'compound list', 'y': compound_list, 'type': 'violin', 'mode': 'markers'}
+        print(compound_list)
+        data = {'x': 'compound list', 'y': compound_list, 'type': 'violin', 'mode': 'markers', 'points': 'all'}
         layout = {'title': 'Compound'}
         chart_data = {'data': [data], 'layout': layout}
 
@@ -126,14 +127,5 @@ def analytics():
         items = response['items']
         context['most_negative_post'] = items[0]['body'] if items else 'N/A'
         
-        print(context)
-
-        # get all data in date range,
-        # get avg sentiment
-        # get top sentiment
-        # get worst sentiment
-        # create graph
-        # response = requests.get('http://127.0.0.1:8090/api/collections/data_source/records').json() 
-
     return render_template('analytics.html', context=context, chart_data=chart_data)
 
