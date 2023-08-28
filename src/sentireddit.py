@@ -18,20 +18,30 @@ def calculate_average_sentiments(items):
         pos_list.append(item['pos'])
         neu_list.append(item['neu'])
         neg_list.append(item['neg'])
-    # print(compound_list)
-    # print(neg_list)
     return mean(compound_list), mean(pos_list), mean(neu_list), mean(neg_list), 
 
-# def sentiment_observation(items):
-#     # data appears to be overwhelmingly positive
-#     # data appears to be very positive
-#     # data appears to be slightly
-#     # data appears to be neutral
-#     # data appears to be slightly negative
-#     # data appears to be very negative
-#     # data appears to be overwhelmingly negative
-#     # data appears to be mixed 
+def sentiment_observation(avg_compound):
+    if avg_compound > 0.9:
+        return 'overwhelmingly positive'
+    elif avg_compound < 0.9 and avg_compound > 0.6:
+        return 'very positive'
+    elif avg_compound < 0.6 and avg_compound > 0.3:
+        return 'positive'
+    elif avg_compound < 0.3 and avg_compound > 0.15:
+        return 'slightly positive'
+    elif avg_compound < 0.15 and avg_compound > -0.15:
+        return 'mixed'
+    elif avg_compound < -0.15 and avg_compound > -0.3:
+        return 'slightly negative'
+    elif avg_compound < -0.3 and avg_compound > -0.6:
+        return 'negative'
+    elif avg_compound < -0.6 and avg_compound > -0.9:
+        return 'very negative'
+    else:
+        return 'overwhelmingly negative'
 
+def get_max_items(request):
+    print(response)
 
 config = dotenv_values(".env")
 # error check and log
@@ -91,6 +101,8 @@ def analytics():
     chart_data = {'data': [data], 'layout': layout}
     context['data_sources'] = response['items']
     if request.method == 'POST' and request.form['form-id'] == 'select-data-source':
+        # need to grab all data from response, I believe I am not grabbing it all
+        
         first_date = int (dt.strptime(request.form['first-date'], '%Y-%m-%d').timestamp())
         second_date = int (dt.strptime(request.form['second-date'], '%Y-%m-%d').timestamp())
         params = {
@@ -102,7 +114,7 @@ def analytics():
         items = response['items']
 
         context['avg_compound'], context['avg_pos'], context['avg_neu'], context['avg_neg'] = calculate_average_sentiments(items)
-
+        context['summary'] = sentiment_observation(context['avg_compound'])
         compound_list = []
         for item in items:
             compound_list.append(item['compound'])
