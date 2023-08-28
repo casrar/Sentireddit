@@ -35,9 +35,14 @@ def calculate_average_sentiments(items):
 
 config = dotenv_values(".env")
 # error check and log
-response = requests.post(
-    'http://127.0.0.1:8090/api/collections/users/auth-with-password', 
-    data={'identity': config['IDENTITY'], 'password': config['PASSWORD']}).json()
+try:
+    response = requests.post(
+        'http://127.0.0.1:8090/api/collections/users/auth-with-password', 
+        data={'identity': config['IDENTITY'], 'password': config['PASSWORD']}).json()
+except:
+    #log
+    print('Error with database, quiting')
+    quit()
 auth_token = response['token']
 
 app = Flask(__name__)
