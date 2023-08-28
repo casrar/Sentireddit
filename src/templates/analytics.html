@@ -7,13 +7,14 @@
 {{ super() }}
 {% endblock %}
 {% block content %}
-<div class="grid grid-cols-2">
-    <div class="flex flex-col">
-        <div>
+<div class="grid grid-cols-2 my-8">
+    <div class="flex flex-col space-y-8">
+        <!-- check if no data sources, if none tell user -->
+        <div class="border border-solid rounded-lg flex flex-col items-center">
             <form action="/analytics" method="POST">
                 <input type="hidden" name="form-id" value="select-data-source">
                 <select name="data-source-selection" id="data-source-selection"> 
-                    {% for item in context['data_sources'] %}
+                    {% for item in context['data_sources'] %} 
                         <option value="{{ item['id'] }}">
                             {{ item['search_term'] }}
                             {{ item['subreddit']}}</option>
@@ -27,25 +28,30 @@
                 </div>
             </form>
         </div>
+        <!-- get the size of the chart and set the dimensions -->
         <div id="plotly-chart"></div>
     </div>
-    <div class="flex flex-col">
-        <div class="grid grid-cols-4">
-            <div>average compound: {{ context['avg_compound'] }}</div>
-            <div>average pos: {{ context['avg_pos'] }}</div>
-            <div>average neu: {{ context['avg_neu'] }}</div>
-            <div>average neg: {{ context['avg_neg'] }}</div>
+    <div class="flex flex-col space-y-8">
+        <div class="grid grid-cols-4 gap-8">
+            <div class="border border-solid rounded-lg">average compound: {{ context['avg_compound'] }}</div>
+            <div class="border border-solid rounded-lg">average pos: {{ context['avg_pos'] }}</div>
+            <div class="border border-solid rounded-lg">average neu: {{ context['avg_neu'] }}</div>
+            <div class="border border-solid rounded-lg">average neg: {{ context['avg_neg'] }}</div>
         </div>
-        <div>
-            summary
+        <div class="w-1/2 border border-solid rounded-lg self-center">
+            Data appears to be {{ context['summary'] }}
         </div>
-        <div class="grid grid-cols-2">
-            <div>{{ context['most_positive_post'] }}</div>
-            <div>{{ context['most_negative_post'] }}</div>
+        <div class="grid grid-cols-2 gap-8">
+            <div class="border border-solid rounded-lg">most pos post: {{ context['most_positive_post'] }}</div>
+            <div class="border border-solid rounded-lg">most neg post: {{ context['most_negative_post'] }}</div>
         </div>
     </div>
 </div>
 <script>
+    // set width based on size of container
+    var plotlyChartWidth = document.getElementById('plotly-chart').offsetWidth;
+    console.log(plotlyChartWidth)
+
     var chart_data = {{ chart_data | tojson | safe }};
     Plotly.newPlot('plotly-chart', chart_data['data'], chart_data['layout']);
 </script>

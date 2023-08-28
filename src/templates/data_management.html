@@ -6,55 +6,55 @@
 {{ super() }}
 {% endblock %}
 {% block content %}
-<div class="grid grid-cols-2">
-    <!-- Data Source Section -->
-    <div class="border flex flex-col"> 
+<div class="grid grid-cols-2 ">
+    <div class="border flex flex-col rounded-lg h-96 ml-20 mr-10 my-20"> 
         <div>
-            <h3>Manage Data Sources</h3>
+            <h3 class="text-2xl">Manage Data Sources</h3>
         </div>
-        <div>
+        <div class="mt-auto">
+            <div class="mb-8">
+                <form action="/data_management" method="POST">
+                    <input type="hidden" name="form-id" value="add-data-source">
+                    <label for="subreddit"><input class="border" type="text" id="subreddit" name="subreddit" placeholder="Subreddit..."></label>
+                    <label for="search-term"><input class="border" type="text" id="search-term" name="search-term" placeholder="Search term..."></label>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>
             <form action="/data_management" method="POST">
-                <input type="hidden" name="form-id" value="add-data-source">
-                <label for="subreddit"></label>
-                <input class="border" type="text" id="subreddit" name="subreddit">
-                <label for="search-term"></label>
-                <input class="border" type="text" id="search-term" name="search-term">
-                <input type="submit" value="Submit">
+                <input type="hidden" name="form-id" value="remove-data-source">
+                    <div class="h-44 overflow-y-auto border border-solid rounded-lg">
+                        {% for item in context['data_sources'] %}
+                            <label>
+                                <input type="checkbox" name="selected-data" value="{{ item.id }}"><input/>
+                                {{ item['search_term'] }}
+                                {{ item['subreddit'] }}
+                            </label>
+                            <br/>
+                        {% endfor %}
+                    </div>
+                <input type="submit" value="Remove Selected">
             </form>
         </div>
-        <form action="/data_management" method="POST">
-            <input type="hidden" name="form-id" value="remove-data-source">
-            <div class="max h-16 overflow-y-auto">
-                {% for item in context['data_sources'] %}
-                    <label>
-                        <input type="checkbox" name="selected-data" value="{{ item.id }}"><input/>
-                        {{ item['search_term'] }}
-                        {{ item['subreddit'] }}
-                    </label>
-                    <br/>
-                {% endfor %}
-            </div>
-            <input type="submit" value="Submit">
-        </form>
     </div>
-    <!-- Data Section -->
-    <div class="border flex flex-col">
-        <h3>Manage Data</h3>
-        <form action="/data_management" method="POST">
-            <input type="hidden" name="form-id" value="remove-data">
-            <div class="max h-16 overflow-y-auto">
-                {% for item in context['data'] %}
-                    <label>
-                        <input type="checkbox" name="selected-data" value="{{ item.id }}"><input/>
-                        {{ item['body'] }}
-                        {{ item['sentiment'] }}
-                        {{ item['data_source'] }}
-                    </label>
-                    <br/>
-                {% endfor %}
-            </div>
-            <input type="submit" value="Submit">
-        </form>
+    <div class="border flex flex-col rounded-lg h-96 ml-10 mr-20 my-20">
+        <h3 class="text-2xl">Manage Data</h3>
+        <div class="mt-auto">
+            <form action="/data_management" method="POST">
+                <input type="hidden" name="form-id" value="remove-data">
+                <div class="h-44 overflow-y-auto border border-solid rounded-lg">
+                    {% for item in context['data'] %}
+                        <label>
+                            <input type="checkbox" name="selected-data" value="{{ item.id }}"><input/>
+                            {{ item['body'] }}
+                            {{ item['sentiment'] }}
+                            {{ item['data_source'] }}
+                        </label>
+                        <br/>
+                    {% endfor %}
+                </div>
+                <input type="submit" value="Remove Selected">
+            </form>
+        </div>
     </div>
 </div>
 {% endblock %}
