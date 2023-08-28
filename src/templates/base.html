@@ -6,11 +6,11 @@
     {% endblock %}
 </head>
 <body>
-    <div id="navigation">
+    <div id="navigation" class="w-1/2 flex border rounded-lg">
         {% block navigation %}
-        <a href="/about">About</a>
-        <a href="/data_management">Data Management</a>        
-        <a href="/analytics">Analytics</a>
+        <a href="/about" class="flex-auto text-4xl">About</a>
+        <a href="/data_management" class="flex-auto text-4xl">Data Management</a>        
+        <a href="/analytics" class="flex-auto text-4xl">Analytics</a>
         {% endblock %}
     </div>
     <div id="content">
@@ -19,7 +19,7 @@
     </div>
     <div id="footer">
         {% block footer %}
-        <p>Sentireddit</p>
+        <p>Created by Casrar</p>
         {% endblock %}
     </div>
 </body>
