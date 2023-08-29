@@ -12,6 +12,9 @@ A self hostable full stack app to provide sentiment analysis Reddit data.
     ~~- graph~~
     - analysis numbers      
 - Style
+- Refactor scraper
+  - error handle, can get 429
+  - just write better overall
 - Fix small QOL bugs
   - remove or add to list of data sources without refresh page 
 - Research architecture 
