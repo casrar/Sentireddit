@@ -34,30 +34,30 @@
     </div>
     <div class="flex flex-col space-y-8 border border-solid border-2 border-black rounded-lg mx-6">
         <div class="flex flex-col items-center mx-2">
-            <h2 class="my-2">
+            <h2 class="my-2 text-2xl">
             Average Sentiments 
             </h2>
             <div class="grid grid-cols-4 gap-8">
                 <div class="border border-solid border-black border-2 rounded-lg flex flex-col items-center px-8 h-20">
-                    <h3>Compound</h3>
+                    <h3 class="text-2xl">Compound</h3>
                     <div class="h-full flex flex-col justify-center">
                         <p>{{ context['avg_compound'] }}</p>
                     </div>
                 </div>
                 <div class="border border-solid border-black border-2 rounded-lg flex flex-col items-center">
-                    <h3>Positive</h3>
+                    <h3 class="text-2xl">Positive</h3>
                     <div class="h-full flex flex-col justify-center">
                         <p>{{ context['avg_pos'] }}</p>
                     </div>
                 </div>
                 <div class="border border-solid border-black border-2 rounded-lg flex flex-col items-center">
-                    <h3>Neutral</h3>
+                    <h3 class="text-2xl">Neutral</h3>
                     <div class="h-full flex flex-col justify-center">
                         <p>{{ context['avg_neu'] }}</p>
                     </div>
                 </div>
                 <div class="border border-solid border-black border-2 rounded-lg flex flex-col items-center">
-                    <h3>Negative</h3>
+                    <h3 class="text-2xl">Negative</h3>
                     <div class="h-full flex flex-col justify-center">
                         <p>{{ context['avg_neg'] }}</p>
                     </div>
@@ -65,18 +65,18 @@
             </div>
         </div>
         <div class="flex flex-col items-center w-fit self-center">
-            <h2 class="">Data Summary</h2>
+            <h2 class="text-2xl">Data Summary</h2>
             <div class="border border-solid border-black border-2 rounded-lg ">
                 <p class="px-1">Data appears to be {{ context['summary'] }}</p>
             </div>
         </div>
         <div class="grid grid-cols-2 gap-8 pl-2 pr-2 pb-2">
             <div class="flex flex-col">
-                <h2 class="self-center">Most Positive Post</h2>
+                <h2 class="text-2xl self-center">Most Positive Post</h2>
                 <div class="max-h-72 border border-solid border-black border-2 rounded-lg px-1 overflow-y-auto">{{ context['most_positive_post'] }}</div>
             </div>
             <div class="flex flex-col">
-                <h2 class="self-center">Most Negative Post</h2>
+                <h2 class="text-2xl self-center">Most Negative Post</h2>
                 <div class="max-h-72 border border-solid border-black border-2 rounded-lg px-1 overflow-y-auto">{{ context['most_negative_post'] }}</div>
             </div>
         </div>
