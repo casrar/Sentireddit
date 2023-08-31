@@ -114,6 +114,11 @@ def analytics():
         items = response['items']
 
         context['avg_compound'], context['avg_pos'], context['avg_neu'], context['avg_neg'] = calculate_average_sentiments(items)
+        context['avg_compound'] = round(context['avg_compound'], 2)
+        context['avg_pos'] = round(context['avg_pos'], 2)
+        context['avg_neu'] = round(context['avg_neu'], 2) 
+        context['avg_neg'] = round(context['avg_neg'], 2) 
+        
         context['summary'] = sentiment_observation(context['avg_compound'])
         compound_list = []
         for item in items:
