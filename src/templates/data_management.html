@@ -7,7 +7,7 @@
 {% endblock %}
 {% block content %}
 <div class="grid grid-cols-2 ">
-    <div class="border flex flex-col rounded-lg h-96 ml-20 mr-10 my-20"> 
+    <div class="border flex flex-col rounded-lg h-96 ml-20 mr-10 my-20 p-2"> 
         <div>
             <h3 class="text-2xl">Manage Data Sources</h3>
         </div>
@@ -25,9 +25,8 @@
                     <div class="h-44 overflow-y-auto border border-solid rounded-lg">
                         {% for item in context['data_sources'] %}
                             <label>
-                                <input type="checkbox" name="selected-data" value="{{ item.id }}"><input/>
-                                {{ item['search_term'] }}
-                                {{ item['subreddit'] }}
+                                <input type="checkbox" name="selected-data" value="{{ item.id }}">
+                                {{ item['subreddit'] }} : {{ item['search_term'] }}
                             </label>
                             <br/>
                         {% endfor %}
@@ -36,7 +35,7 @@
             </form>
         </div>
     </div>
-    <div class="border flex flex-col rounded-lg h-96 ml-10 mr-20 my-20">
+    <div class="border flex flex-col rounded-lg h-96 ml-10 mr-20 my-20 p-2">
         <h3 class="text-2xl">Manage Data</h3>
         <div class="mt-auto">
             <form action="/data_management" method="POST">
@@ -44,7 +43,7 @@
                 <div class="h-44 overflow-y-auto border border-solid rounded-lg">
                     {% for item in context['data'] %}
                         <label>
-                            <input type="checkbox" name="selected-data" value="{{ item.id }}"><input/>
+                            <input type="checkbox" name="selected-data" value="{{ item.id }}">
                             {{ item['body'] }}
                             {{ item['sentiment'] }}
                             {{ item['data_source'] }}

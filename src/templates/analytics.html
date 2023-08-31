@@ -17,8 +17,8 @@
                     <select name="data-source-selection" id="data-source-selection"> 
                         {% for item in context['data_sources'] %} 
                             <option value="{{ item['id'] }}">
-                                {{ item['search_term'] }}
-                                {{ item['subreddit']}}</option>
+                                {{ item['subreddit']}} : {{ item['search_term'] }} 
+                                </option>
                         {% endfor %}
                     </select>  
                     <div>           
