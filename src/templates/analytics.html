@@ -10,40 +10,75 @@
 <div class="grid grid-cols-2 my-8">
     <div class="flex flex-col space-y-8">
         <!-- check if no data sources, if none tell user -->
-        <div class="border border-solid rounded-lg flex flex-col items-center">
+        <div class="w-fit border border-solid border-black border-2 rounded-lg flex flex-col self-center items-center p-2">
             <form action="/analytics" method="POST">
-                <input type="hidden" name="form-id" value="select-data-source">
-                <select name="data-source-selection" id="data-source-selection"> 
-                    {% for item in context['data_sources'] %} 
-                        <option value="{{ item['id'] }}">
-                            {{ item['search_term'] }}
-                            {{ item['subreddit']}}</option>
-                    {% endfor %}
-                </select>     
-                <div>           
-                    <input type="hidden" name="form-id" value="select-date">
-                    <input type="date" name="first-date" required/>
-                    <input type="date" name="second-date" required/>
-                    <input type="submit" value="Submit">
-                </div>
+                <div class="flex flex-col items-center">
+                    <input type="hidden" name="form-id" value="select-data-source">
+                    <select name="data-source-selection" id="data-source-selection"> 
+                        {% for item in context['data_sources'] %} 
+                            <option value="{{ item['id'] }}">
+                                {{ item['search_term'] }}
+                                {{ item['subreddit']}}</option>
+                        {% endfor %}
+                    </select>  
+                    <div>           
+                        <input type="hidden" name="form-id" value="select-date">
+                        <input type="date" name="first-date" required/>
+                        <input type="date" name="second-date" required/>
+                        <input type="submit" value="Select Range">
+                    </div>
+                </div>   
             </form>
         </div>
-        <!-- get the size of the chart and set the dimensions -->
         <div id="plotly-chart"></div>
     </div>
-    <div class="flex flex-col space-y-8">
-        <div class="grid grid-cols-4 gap-8">
-            <div class="border border-solid rounded-lg">average compound: {{ context['avg_compound'] }}</div>
-            <div class="border border-solid rounded-lg">average pos: {{ context['avg_pos'] }}</div>
-            <div class="border border-solid rounded-lg">average neu: {{ context['avg_neu'] }}</div>
-            <div class="border border-solid rounded-lg">average neg: {{ context['avg_neg'] }}</div>
+    <div class="flex flex-col space-y-8 border border-solid border-2 border-black rounded-lg mx-6">
+        <div class="flex flex-col items-center mx-2">
+            <h2 class="my-2">
+            Average Sentiments 
+            </h2>
+            <div class="grid grid-cols-4 gap-8">
+                <div class="border border-solid border-black border-2 rounded-lg flex flex-col items-center px-8 h-20">
+                    <h3>Compound</h3>
+                    <div class="h-full flex flex-col justify-center">
+                        <p>{{ context['avg_compound'] }}</p>
+                    </div>
+                </div>
+                <div class="border border-solid border-black border-2 rounded-lg flex flex-col items-center">
+                    <h3>Positive</h3>
+                    <div class="h-full flex flex-col justify-center">
+                        <p>{{ context['avg_pos'] }}</p>
+                    </div>
+                </div>
+                <div class="border border-solid border-black border-2 rounded-lg flex flex-col items-center">
+                    <h3>Neutral</h3>
+                    <div class="h-full flex flex-col justify-center">
+                        <p>{{ context['avg_neu'] }}</p>
+                    </div>
+                </div>
+                <div class="border border-solid border-black border-2 rounded-lg flex flex-col items-center">
+                    <h3>Negative</h3>
+                    <div class="h-full flex flex-col justify-center">
+                        <p>{{ context['avg_neg'] }}</p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="w-1/2 border border-solid rounded-lg self-center">
-            Data appears to be {{ context['summary'] }}
+        <div class="flex flex-col items-center w-fit self-center">
+            <h2 class="">Data Summary</h2>
+            <div class="border border-solid border-black border-2 rounded-lg ">
+                <p class="px-1">Data appears to be {{ context['summary'] }}</p>
+            </div>
         </div>
-        <div class="grid grid-cols-2 gap-8">
-            <div class="border border-solid rounded-lg">most pos post: {{ context['most_positive_post'] }}</div>
-            <div class="border border-solid rounded-lg">most neg post: {{ context['most_negative_post'] }}</div>
+        <div class="grid grid-cols-2 gap-8 pl-2 pr-2 pb-2">
+            <div class="flex flex-col">
+                <h2 class="self-center">Most Positive Post</h2>
+                <div class="max-h-72 border border-solid border-black border-2 rounded-lg px-1 overflow-y-auto">{{ context['most_positive_post'] }}</div>
+            </div>
+            <div class="flex flex-col">
+                <h2 class="self-center">Most Negative Post</h2>
+                <div class="max-h-72 border border-solid border-black border-2 rounded-lg px-1 overflow-y-auto">{{ context['most_negative_post'] }}</div>
+            </div>
         </div>
     </div>
 </div>
