@@ -11,20 +11,21 @@
     <div class="flex flex-col space-y-8">
         <!-- check if no data sources, if none tell user -->
         <div class="w-fit border border-solid border-black border-2 rounded-lg flex flex-col self-center items-center p-2">
-            <form action="/analytics" method="POST">
-                <div class="flex flex-col items-center">
+            <form id="analytics" action="/analytics" method="POST">
+                <div class="flex flex-row items-center">
                     <input type="hidden" name="form-id" value="select-data-source">
-                    <select name="data-source-selection" id="data-source-selection"> 
+                    <select name="data-source-selection" id="data-source-selection" required> 
+                        <option value="" selected disabled hidden>Select Data Source....</option>
                         {% for item in context['data_sources'] %} 
-                            <option value="{{ item['id'] }}">
-                                {{ item['subreddit']}} : {{ item['search_term'] }} 
-                                </option>
+                            <option value="{{ item['id'] }}" required>
+                                r/{{ item['subreddit']}} : {{ item['search_term'] }} 
+                            </option>
                         {% endfor %}
                     </select>  
                     <div>           
                         <input type="hidden" name="form-id" value="select-date">
-                        <input type="date" name="first-date" required/>
-                        <input type="date" name="second-date" required/>
+                        <input id="first-date" type="date" name="first-date" required/>
+                        <input id="second-date" type="date" name="second-date" required/>
                         <input type="submit" value="Select Range">
                     </div>
                 </div>   
@@ -41,25 +42,41 @@
                 <div class="border border-solid border-black border-2 rounded-lg flex flex-col items-center px-8 h-20">
                     <h3 class="text-2xl">Compound</h3>
                     <div class="h-full flex flex-col justify-center">
-                        <p>{{ context['avg_compound'] }}</p>
+                        {% if context['avg_compound'] %}
+                            <p>{{ context['avg_compound'] }}</p>
+                        {% else %}
+                            <p>N/A</p>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="border border-solid border-black border-2 rounded-lg flex flex-col items-center">
                     <h3 class="text-2xl">Positive</h3>
                     <div class="h-full flex flex-col justify-center">
-                        <p>{{ context['avg_pos'] }}</p>
+                        {% if context['avg_pos'] %}
+                            <p>{{ context['avg_pos'] }}</p>
+                        {% else %}
+                            <p>N/A</p>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="border border-solid border-black border-2 rounded-lg flex flex-col items-center">
                     <h3 class="text-2xl">Neutral</h3>
                     <div class="h-full flex flex-col justify-center">
-                        <p>{{ context['avg_neu'] }}</p>
+                        {% if context['avg_neu'] %}
+                            <p>{{ context['avg_neu'] }}</p>
+                        {% else %}
+                            <p>N/A</p>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="border border-solid border-black border-2 rounded-lg flex flex-col items-center">
                     <h3 class="text-2xl">Negative</h3>
                     <div class="h-full flex flex-col justify-center">
-                        <p>{{ context['avg_neg'] }}</p>
+                        {% if context['avg_neg'] %}
+                            <p>{{ context['avg_neg'] }}</p>
+                        {% else %}
+                            <p>N/A</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -67,25 +84,54 @@
         <div class="flex flex-col items-center w-fit self-center">
             <h2 class="text-2xl">Data Summary</h2>
             <div class="border border-solid border-black border-2 rounded-lg ">
-                <p class="px-1">Data appears to be {{ context['summary'] }}</p>
+                <p class="px-2">
+                    {% if context['summary'] %}
+                        Data appears to be {{ context['summary'] }}
+                    {% else %} <!-- Not called when no data exists, method for calc avg needs to handle edge case  -->
+                        N/A
+                    {% endif %}
+                </p>
             </div>
         </div>
         <div class="grid grid-cols-2 gap-8 pl-2 pr-2 pb-2">
             <div class="flex flex-col">
                 <h2 class="text-2xl self-center">Most Positive Post</h2>
-                <div class="max-h-72 border border-solid border-black border-2 rounded-lg px-1 overflow-y-auto">{{ context['most_positive_post'] }}</div>
+                <div class="max-h-72 border border-solid border-black border-2 rounded-lg px-2 overflow-y-auto">
+                    {% if context['most_positive_post'] %}
+                        <p>{{ context['most_positive_post'] }}</p>
+                    {% else %}
+                        <p>N/A</p>
+                    {% endif %}
+                </div>
             </div>
             <div class="flex flex-col">
                 <h2 class="text-2xl self-center">Most Negative Post</h2>
-                <div class="max-h-72 border border-solid border-black border-2 rounded-lg px-1 overflow-y-auto">{{ context['most_negative_post'] }}</div>
+                <div class="max-h-72 border border-solid border-black border-2 rounded-lg px-2 overflow-y-auto">
+                    {% if context['most_negative_post'] %}
+                        <p>{{ context['most_negative_post'] }}</p>
+                    {% else %}
+                        <p>N/A</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
 </div>
 <script>
-    // set width based on size of container
-    var plotlyChartWidth = document.getElementById('plotly-chart').offsetWidth;
-    console.log(plotlyChartWidth)
+    firstDate = document.getElementById("first-date")
+    secondDate = document.getElementById("second-date")
+    dataSourceSelection = document.getElementById("data-source-selection")
+
+    firstDate.onchange = function() {updateAnalyticsDataSource()};
+    secondDate.onchange = function() {updateAnalyticsDataSource()};
+    dataSourceSelection.onchange = function() {updateAnalyticsDataSource()};
+
+    function updateAnalyticsDataSource() {
+        if (!firstDate['value'] || !secondDate['value'] || !dataSourceSelection['value']) {
+            return
+        }
+        document.getElementById('analytics').requestSubmit();
+    }
 
     var chart_data = {{ chart_data | tojson | safe }};
     Plotly.newPlot('plotly-chart', chart_data['data'], chart_data['layout']);
