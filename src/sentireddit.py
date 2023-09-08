@@ -7,6 +7,24 @@ import urllib.parse
 import plotly.express as px
 import pandas as pd
 from statistics import mean 
+from flask_htmx import HTMX
+import jinja_partials
+
+config = dotenv_values(".env")
+# error check and log
+try:
+    response = requests.post(
+        'http://127.0.0.1:8090/api/collections/users/auth-with-password', 
+        data={'identity': config['IDENTITY'], 'password': config['PASSWORD']}).json()
+except:
+    #log
+    print('Error with database, quiting')
+    quit()
+auth_token = response['token']
+
+app = Flask(__name__)
+htmx = HTMX(app)
+jinja_partials.register_extensions(app)
 
 def calculate_average_sentiments(items):
     avg_compound = avg_pos = avg_neu = avg_neg = 0 
@@ -42,20 +60,6 @@ def sentiment_observation(avg_compound):
 
 def get_max_items(request):
     print(response)
-
-config = dotenv_values(".env")
-# error check and log
-try:
-    response = requests.post(
-        'http://127.0.0.1:8090/api/collections/users/auth-with-password', 
-        data={'identity': config['IDENTITY'], 'password': config['PASSWORD']}).json()
-except:
-    #log
-    print('Error with database, quiting')
-    quit()
-auth_token = response['token']
-
-app = Flask(__name__)
 
 @app.route('/',methods=['GET'])
 def index():
