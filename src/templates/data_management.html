@@ -15,17 +15,17 @@
             <div class="mb-8">
                 <form action="/data_management" method="POST">
                     <input type="hidden" name="form-id" value="add-data-source">
-                    <label for="subreddit"><input class="border" type="text" id="subreddit" name="subreddit" placeholder="Subreddit..."></label>
-                    <label for="search-term"><input class="border" type="text" id="search-term" name="search-term" placeholder="Search term..."></label>
-                    <input type="submit" value="Submit">
+                    <input class="border border-solid border-black border-2 rounded-lg" type="text" id="subreddit" name="subreddit" placeholder="Subreddit...">
+                    <input class="border border-solid border-black border-2 rounded-lg" type="text" id="search-term" name="search-term" placeholder="Search term...">
+                    <input class="border border-solid border-black border-2 rounded-lg" type="submit" value="Submit">
                 </form>
             </div>
             <form action="/data_management" method="POST">
                 <input type="hidden" name="form-id" value="remove-data-source">
-                    <div class="h-44 overflow-y-auto border border-solid border-black border-2 rounded-lg ">
+                    <div class="h-44 overflow-y-auto border border-solid border-black border-2 rounded-lg p-2">
                         {% for item in context['data_sources'] %}
-                        <div class="flex">
-                            <input type="checkbox" name="selected-data" value="{{ item.id }}">
+                        <div class="flex mb-2">
+                            <input class="mr-2" type="checkbox" name="selected-data" value="{{ item.id }}">
                             <label class="w-full border border-solid border-black border-2 rounded-lg text-center">
                                 {{ item['subreddit'] }} : {{ item['search_term'] }}
                             </label>
@@ -33,7 +33,7 @@
                         </div>
                         {% endfor %}
                     </div>
-                <input type="submit" value="Remove Selected">
+                <input class="border border-solid border-black border-2 rounded-lg mt-2" type="submit" value="Remove Selected">
             </form>
         </div>
     </div>
@@ -42,10 +42,10 @@
         <div class="mt-auto">
             <form action="/data_management" method="POST">
                 <input type="hidden" name="form-id" value="remove-data">
-                <div class="h-44 overflow-y-auto border border-solid border-black border-2 rounded-lg">
+                <div class="h-44 overflow-y-auto border border-solid border-black border-2 rounded-lg p-2">
                     {% for item in context['data'] %}
-                        <div class="flex">
-                            <input type="checkbox" name="selected-data" value="{{ item.id }}">
+                        <div class="flex mb-2">
+                            <input class="mr-2" type="checkbox" name="selected-data" value="{{ item.id }}">
                             <label class="w-full border border-solid border-black border-2 rounded-lg text-center">
                                 {{ item['body'] }}
                             </label>
@@ -53,7 +53,7 @@
                         </div>
                     {% endfor %}
                 </div>
-                <input type="submit" value="Remove Selected">
+                <input class="border border-solid border-black border-2 rounded-lg mt-2" type="submit" value="Remove Selected">
             </form>
         </div>
     </div>
