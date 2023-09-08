@@ -11,6 +11,8 @@ nltk = "*"
 plotly = "*"
 pandas = "*"
 flask = "*"
+flask-htmx = "*"
+jinja-partials = "*"
 
 [dev-packages]
 
