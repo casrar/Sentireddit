@@ -95,7 +95,10 @@ for data_source in data_sources:
             'post_id': match.id, 
             'data_source': data_source_id,
             'post_date': match.created_utc, 
-            'sentiment': match.sentiment_analysis
+            'compound': match.sentiment_analysis['compound'],
+            'pos': match.sentiment_analysis['pos'],
+            'neu': match.sentiment_analysis['neu'],
+            'neg': match.sentiment_analysis['neg']
             }
         response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=data, headers={'Authorization': auth_token}).json()
     

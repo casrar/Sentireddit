@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% block head %}
+    <link href="../static/styles.css" rel="stylesheet">
+    {% endblock %}
+</head>
+<body class="">
+    <div class="w-full">
+        <div style="border-bottom-right-radius: 40rem;" id="navigation" class="w-1/2 flex border-b-2 border-r-2 border-black bg-white p-2 text-4xl">
+            {% block navigation %}
+            <a href="/about" class=" flex-auto">About</a>
+            <a href="/data_management" class="flex-auto">Data Management</a>        
+            <a href="/analytics" class="flex-auto">Analytics</a>
+            {% endblock %}
+        </div>
+    </div>
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <div id="footer">
+        {% block footer %}
+        <footer class="fixed bottom-0 w-full">
+            <p class="text-2xl">Created by <a href="https://github.com/casrar/Sentireddit" target="_blank">Casrar</a></p>
+        </footer>
+        {% endblock %}
+    </div>
+</body>
+</html>
