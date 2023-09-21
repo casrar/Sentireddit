@@ -1,3 +1,14 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.data-management-scrollbar::-webkit-scrollbar-thumb {
+    background-color: rgb(249, 115, 22);
+    height: 2rem;
+    border-radius: .2rem; 
+}
+
+.data-management-scrollbar::-webkit-scrollbar {
+    width: .5rem;
+}
