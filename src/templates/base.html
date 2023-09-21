@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="font-roboto">
 <head>
     {% block head %}
     <link href="../static/styles.css" rel="stylesheet">
     <script src="../static/htmx.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;1,300&display=swap" rel="stylesheet">
     {% endblock %}
 </head>
-<body class="min-h-screen flex flex-col font-sans bg-gray-200">
+<body class="min-h-screen flex flex-col bg-gray-200 ">
     <div class="w-full">
         <div style="border-bottom-right-radius: 40rem;" id="navigation" class="w-1/2 flex border-b-2 border-r-2 bg-orange-500 border-black p-2 text-4xl">
             {% block navigation %}
