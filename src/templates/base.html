@@ -6,21 +6,21 @@
     <script src="../static/htmx.min.js"></script>
     {% endblock %}
 </head>
-<body class="">
+<body class="min-h-screen flex flex-col font-sans bg-gray-200">
     <div class="w-full">
-        <div style="border-bottom-right-radius: 40rem;" id="navigation" class="w-1/2 flex border-b-2 border-r-2 border-black bg-white p-2 text-4xl">
+        <div style="border-bottom-right-radius: 40rem;" id="navigation" class="w-1/2 flex border-b-2 border-r-2 bg-orange-500 border-black p-2 text-4xl">
             {% block navigation %}
-            <a href="/about" class=" flex-auto">About</a>
-            <a href="/data_management" class="flex-auto">Data Management</a>        
-            <a href="/analytics" class="flex-auto">Analytics</a>
+            <div class="flex-auto"><a href="/about">About</a></div>
+            <div class="flex-auto"><a href="/data_management">Data Management</a></div>
+            <div class="flex-auto"><a href="/analytics">Analytics</a></div>
             {% endblock %}
         </div>
     </div>
-    <div id="content">
+    <div id="content" class="flex-grow">
         {% block content %}
         {% endblock %}
     </div>
-    <div id="footer">
+    <div id="footer" class="bg-gray-900">
         {% block footer %}
         <footer class="fixed bottom-0 w-full">
             <p class="text-2xl">Created by <a href="https://github.com/casrar/Sentireddit" target="_blank">Casrar</a></p>
