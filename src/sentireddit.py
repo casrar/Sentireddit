@@ -38,7 +38,7 @@ def calculate_average_sentiments(items):
         neg_list.append(item['neg'])
     return mean(compound_list), mean(pos_list), mean(neu_list), mean(neg_list), 
 
-def sentiment_observation(avg_compound):
+def sentiment_observation(avg_compound): # error with overwhelmingly negative, compound = .3
     if avg_compound > 0.9:
         return 'overwhelmingly positive'
     elif avg_compound < 0.9 and avg_compound > 0.6:
