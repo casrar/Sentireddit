@@ -42,7 +42,7 @@
         <div class="mt-auto">
             <form action="/data_management" method="POST">
                 <input type="hidden" name="form-id" value="remove-data">
-                <div class="h-44 overflow-y-auto data-management-scrollbar border border-solid border-black border-2 rounded-lg p-2">
+                <div class="max-h-60 overflow-y-auto data-management-scrollbar border border-solid border-black border-2 rounded-lg p-2">
                     {% for item in context['data'] %}
                         <div class="flex mb-2">
                             <input class="mr-2 accent-orange-500" type="checkbox" name="selected-data" value="{{ item.id }}">
