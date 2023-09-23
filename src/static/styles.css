@@ -693,6 +693,22 @@ video {
   flex: 1 1 auto;
 }
 
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.flex-\[4\] {
+  flex: 4;
+}
+
+.flex-\[5\] {
+  flex: 5;
+}
+
+.flex-\[10\] {
+  flex: 10;
+}
+
 .flex-grow {
   flex-grow: 1;
 }
