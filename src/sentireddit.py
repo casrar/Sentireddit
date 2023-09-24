@@ -41,10 +41,6 @@ def data_management():
     context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
     context['data'] = utils.get_all_data(auth_token)['items']
 
-    if request.method == 'POST' and request.form['form-id'] == 'remove-data-source':
-        selected_data = request.form.getlist('selected-data')
-        for data in selected_data:
-            response = requests.delete(f'http://127.0.0.1:8090/api/collections/data_source/records/{data}')
     if request.method == 'POST' and request.form['form-id'] == 'remove-data':
         selected_data = request.form.getlist('selected-data')
         for data in selected_data:
@@ -63,16 +59,13 @@ def add_data_source():
     response = requests.post('http://127.0.0.1:8090/api/collections/data_source/records',
                                 json=data).json()     
     context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
-    # need the item to add 
-    # need the curr list of items
-    # need to post item to db
-    # need to append item to list
-    # need to return list and rerender
-
     return render_template('/partials/data_sources.html', context=context)
 
-
-
+@app.route('/remove_data_source', methods=['POST'])
+def remove_data_source():
+    selected_data = request.form.getlist('selected-data')
+    for data in selected_data:
+        response = requests.delete(f'http://127.0.0.1:8090/api/collections/data_source/records/{data}')
 
 
 @app.route('/analytics', methods=['POST', 'GET'])
