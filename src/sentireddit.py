@@ -6,9 +6,9 @@ from datetime import date, datetime as dt
 import urllib.parse
 import plotly.express as px
 import pandas as pd
-from statistics import mean 
 from flask_htmx import HTMX
 import jinja_partials
+import utils
 
 config = dotenv_values(".env")
 # error check and log
@@ -26,42 +26,7 @@ app = Flask(__name__)
 htmx = HTMX(app)
 jinja_partials.register_extensions(app)
 
-def calculate_average_sentiments(items):
-    avg_compound = avg_pos = avg_neu = avg_neg = 0 
-    if len(items) < 1:
-        return avg_compound, avg_pos, avg_neu, avg_neg
-    compound_list, pos_list, neu_list, neg_list = [], [], [], []
-    for item in items:
-        compound_list.append(item['compound'])
-        pos_list.append(item['pos'])
-        neu_list.append(item['neu'])
-        neg_list.append(item['neg'])
-    return mean(compound_list), mean(pos_list), mean(neu_list), mean(neg_list), 
-
-def sentiment_observation(avg_compound): # error with overwhelmingly negative, compound = .3
-    if avg_compound > 0.9:
-        return 'overwhelmingly positive'
-    elif avg_compound < 0.9 and avg_compound > 0.6:
-        return 'very positive'
-    elif avg_compound < 0.6 and avg_compound > 0.3:
-        return 'positive'
-    elif avg_compound < 0.3 and avg_compound > 0.15:
-        return 'slightly positive'
-    elif avg_compound < 0.15 and avg_compound > -0.15:
-        return 'mixed'
-    elif avg_compound < -0.15 and avg_compound > -0.3:
-        return 'slightly negative'
-    elif avg_compound < -0.3 and avg_compound > -0.6:
-        return 'negative'
-    elif avg_compound < -0.6 and avg_compound > -0.9:
-        return 'very negative'
-    else:
-        return 'overwhelmingly negative'
-
-def get_max_items(request):
-    print(response)
-
-@app.route('/',methods=['GET'])
+@app.route('/', methods=['GET'])
 def index():
     return render_template('index.html')
 
@@ -72,18 +37,10 @@ def about():
 @app.route('/data_management', methods=['POST', 'GET'])
 def data_management():
     context = {}
-    response = requests.get('http://127.0.0.1:8090/api/collections/data_source/records').json() 
-    context['data_sources'] = response['items']
-    response = requests.get('http://127.0.0.1:8090/api/collections/data/records').json() 
-    context['data'] = response['items']
+    print(utils.get_all_data_sources(auth_token)['items'])
+    context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
+    context['data'] = utils.get_all_data(auth_token)['items']
 
-    if request.method == 'POST' and request.form['form-id'] == 'add-data-source':
-        data = {
-            'subreddit': request.form['subreddit'],
-            'search_term': request.form['search-term']
-        }
-        response = requests.post('http://127.0.0.1:8090/api/collections/data_source/records',
-                                 json=data).json() 
     if request.method == 'POST' and request.form['form-id'] == 'remove-data-source':
         selected_data = request.form.getlist('selected-data')
         for data in selected_data:
@@ -95,6 +52,28 @@ def data_management():
    
 
     return render_template('data_management.html', context=context)
+
+@app.route('/add_data_source', methods=['POST'])
+def add_data_source():
+    context = {}
+    data = {
+        'subreddit': request.form['subreddit'],
+        'search_term': request.form['search-term']
+    }
+    response = requests.post('http://127.0.0.1:8090/api/collections/data_source/records',
+                                json=data).json()     
+    context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
+    # need the item to add 
+    # need the curr list of items
+    # need to post item to db
+    # need to append item to list
+    # need to return list and rerender
+
+    return render_template('/partials/data_sources.html', context=context)
+
+
+
+
 
 @app.route('/analytics', methods=['POST', 'GET'])
 def analytics():
@@ -117,13 +96,13 @@ def analytics():
                                 headers={'Authorization': auth_token}).json() 
         items = response['items']
 
-        context['avg_compound'], context['avg_pos'], context['avg_neu'], context['avg_neg'] = calculate_average_sentiments(items)
+        context['avg_compound'], context['avg_pos'], context['avg_neu'], context['avg_neg'] = utils.calculate_average_sentiments(items)
         context['avg_compound'] = round(context['avg_compound'], 2)
         context['avg_pos'] = round(context['avg_pos'], 2)
         context['avg_neu'] = round(context['avg_neu'], 2) 
         context['avg_neg'] = round(context['avg_neg'], 2) 
         
-        context['summary'] = sentiment_observation(context['avg_compound'])
+        context['summary'] = utils.sentiment_observation(context['avg_compound'])
         compound_list = []
         for item in items:
             compound_list.append(item['compound'])

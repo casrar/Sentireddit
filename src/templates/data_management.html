@@ -13,7 +13,7 @@
         </div>
         <div class="mt-auto">
             <div class="mb-8">
-                <form action="/data_management" method="POST">
+                <form hx-post="/add_data_source" hx-trigger="submit" hx-target="#data-sources" hx-swap="outerHTML">
                     <input type="hidden" name="form-id" value="add-data-source">
                     <input class="border border-solid border-black border-2 rounded-lg" type="text" id="subreddit" name="subreddit" placeholder="Subreddit...">
                     <input class="border border-solid border-black border-2 rounded-lg" type="text" id="search-term" name="search-term" placeholder="Search term...">
@@ -22,7 +22,7 @@
             </div>
             <form action="/data_management" method="POST">
                 <input type="hidden" name="form-id" value="remove-data-source">
-                    <div class="h-44 overflow-y-auto data-management-scrollbar border border-solid border-black border-2 rounded-lg p-2">
+                    <div id="data-sources" class="h-44 overflow-y-auto data-management-scrollbar border border-solid border-black border-2 rounded-lg p-2">
                         {% for item in context['data_sources'] %}
                         <div class="flex mb-2">
                             <input class="mr-2 accent-orange-500" type="checkbox" name="selected-data" value="{{ item.id }}">
