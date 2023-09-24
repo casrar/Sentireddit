@@ -20,7 +20,7 @@
                     <input class="border border-solid bg-orange-500 border-black border-2 rounded-lg px-2" type="submit" value="Submit">
                 </form>
             </div>
-            <form action="/data_management" method="POST">
+            <form hx-delete="/remove_data_source" hx-trigger="submit" hx-target="#data-sources" hx-swap="outerHTML">
                 <input type="hidden" name="form-id" value="remove-data-source">
                     <div id="data-sources" class="h-44 overflow-y-auto data-management-scrollbar border border-solid border-black border-2 rounded-lg p-2">
                         {% for item in context['data_sources'] %}
@@ -40,7 +40,7 @@
     <div class="border flex flex-col bg-white border-solid border-black border-2 rounded-lg h-96 ml-10 mr-20 my-20 p-2 shadow-2xl">
         <h3 class="text-2xl">Manage Data</h3>
         <div class="mt-auto">
-            <form action="/data_management" method="POST">
+            <form hx-delete="/remove_data" hx-trigger="submit" hx-target="#data" hx-swap="outerHTML">
                 <input type="hidden" name="form-id" value="remove-data">
                 <div id="data" class="max-h-60 overflow-y-auto data-management-scrollbar border border-solid border-black border-2 rounded-lg p-2">
                     {% for item in context['data'] %}

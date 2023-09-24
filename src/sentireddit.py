@@ -41,12 +41,6 @@ def data_management():
     context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
     context['data'] = utils.get_all_data(auth_token)['items']
 
-    if request.method == 'POST' and request.form['form-id'] == 'remove-data':
-        selected_data = request.form.getlist('selected-data')
-        for data in selected_data:
-            response = requests.delete(f'http://127.0.0.1:8090/api/collections/data/records/{data}')
-   
-
     return render_template('data_management.html', context=context)
 
 @app.route('/add_data_source', methods=['POST'])
@@ -61,12 +55,26 @@ def add_data_source():
     context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
     return render_template('/partials/data_sources.html', context=context)
 
-@app.route('/remove_data_source', methods=['POST'])
+@app.route('/remove_data_source', methods=['DELETE'])
 def remove_data_source():
+    context = {}
     selected_data = request.form.getlist('selected-data')
-    for data in selected_data:
-        response = requests.delete(f'http://127.0.0.1:8090/api/collections/data_source/records/{data}')
+    for id in selected_data:
+        response = requests.delete(f'http://127.0.0.1:8090/api/collections/data_source/records/{id}')
+    context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
 
+    return render_template('/partials/data_sources.html', context=context)
+    
+
+@app.route('/remove_data', methods=['DELETE'])
+def remove_data():
+    context = {}
+    selected_data = request.form.getlist('selected-data')
+    for id in selected_data:
+        response = requests.delete(f'http://127.0.0.1:8090/api/collections/data/records/{id}')
+    context['data'] = utils.get_all_data(auth_token)['items']
+        
+    return render_template('/partials/data.html', context=context)
 
 @app.route('/analytics', methods=['POST', 'GET'])
 def analytics():
