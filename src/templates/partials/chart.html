@@ -1,0 +1,9 @@
+<div id="plotly-chart">
+    {% if chart_data == None %}
+        <h3>Please select a data source, date range, and graph type.</h3>
+    {% endif %}
+</div>
+<script>
+    var chart_data = {{ chart_data | tojson | safe }};
+    Plotly.newPlot('plotly-chart', chart_data['data'], chart_data['layout']);
+</script>
