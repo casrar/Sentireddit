@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
 {{ super() }}
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 {% endblock %}
 {% block navigation %}
 {{ super() }}
@@ -15,26 +14,24 @@
                 <h3>Please select a data source, date range, and graph type.</h3>
             {% endif %}
         </div>
-                <!-- Non functioning -->
                 <div class="flex flex-row justify-center space-x-4">
                     <label>
-                        <!-- <input hx-post="/update_graph" hx-target="#plotly-chart" type="radio" class="accent-purple-400" name="chartType" value="Compound" required> -->
-                        <input checked hx-post="/update_graph" hx-swap="none" type="radio" class="accent-purple-400" name="chartType" value="Compound" >
+                        <input checked hx-post="/update_graph" hx-target="#plotly-chart" type="radio" class="accent-purple-400" name="chartType" value="Compound" >
                         Compound
                     </label><br>
             
                     <label>
-                        <input hx-post="/update_graph" hx-swap="none" type="radio" class="accent-green-400" name="chartType" value="Positive">
+                        <input hx-post="/update_graph" hx-target="#plotly-chart" type="radio" class="accent-green-400" name="chartType" value="Positive">
                         Positive
                     </label><br>
             
                     <label>
-                        <input hx-post="/update_graph" hx-swap="none" type="radio" class="accent-slate-400" name="chartType" value="Neutral">
+                        <input hx-post="/update_graph" hx-target="#plotly-chart" type="radio" class="accent-slate-400" name="chartType" value="Neutral">
                         Neutral
                     </label><br>
             
                     <label>
-                        <input hx-post="/update_graph" hx-swap="none" type="radio" class="accent-red-400" name="chartType" value="Negative">
+                        <input hx-post="/update_graph" hx-target="#plotly-chart" type="radio" class="accent-red-400" name="chartType" value="Negative">
                         Negative
                     </label><br>
                 </div>
@@ -128,7 +125,7 @@
     <div class="w-fit bg-white border border-solid border-black border-2 rounded-lg flex flex-col self-center items-center p-2">
             <div class="flex flex-row items-center space-x-4">
                 <!-- <input type="hidden" name="form-id" value="select-data-source"> -->
-                <select hx-post="/update_data_source" hx-swap="none" class="bg-white" name="data-source-selection" id="data-source-selection" required> 
+                <select hx-post="/update_data_source" hx-swap="outerHTML" hx-target="#analytics" class="bg-white" name="data-source-selection" id="data-source-selection" required> 
                     <option value="" selected disabled hidden>Select Data Source....</option>
                     {% for item in context['data_sources'] %} 
                         <option value="{{ item['id'] }}" required>
@@ -138,19 +135,13 @@
                 </select>  
                 <div>           
                     <input type="hidden" name="form-id" value="select-date">
-                    <input hx-post="/update_data_source" hx-swap="none"  id="first-date" type="date" name="first-date" required/>
-                    <input hx-post="/update_data_source" hx-swap="none" id="second-date" type="date" name="second-date" required/>
+                    <input hx-post="/update_data_source" hx-swap="outerHTML" hx-target="#analytics"  id="first-date" type="date" name="first-date" required/>
+                    <input hx-post="/update_data_source" hx-swap="outerHTML" hx-target="#analytics" id="second-date" type="date" name="second-date" required/>
                 </div>
             </div>   
     </div>
 </div>
 </form>
-<script>
-    graphSentiment = document.getElementById("graph-sentiment")
-    
-    var chart_data = {{ chart_data | tojson | safe }};
-    Plotly.newPlot('plotly-chart', chart_data['data'], chart_data['layout']);
-</script>
 {% endblock %}
 {% block footer %}
 {{ super() }}
