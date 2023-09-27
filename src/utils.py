@@ -10,6 +10,20 @@ def is_empty(x):
         return True
     return False
 
+def validate_analytics_form(request):
+    chart_type = request.form['chartType']
+    data_source = request.form['data-source-selection']
+    first_date = request.form['first-date']
+    second_date = request.form['second-date']
+    if (is_empty(chart_type) or is_empty(data_source) or 
+        is_empty(first_date) or is_empty(second_date)):    
+        return None
+
+    if not (chart_type == 'Compound' or chart_type == 'Positive' or chart_type == 'Neutral' or chart_type == 'Negative'):
+        return None
+    
+    return chart_type, data_source, first_date, second_date
+
 def get_chart_type_index(chart_type):
     if chart_type == 'Compound':
         return 'compound'
@@ -20,6 +34,20 @@ def get_chart_type_index(chart_type):
     if chart_type == 'Negative':
         return 'neg'
     return None
+
+def generate_chart(chart_type, first_date, second_date, data_source, auth_token):
+    items = get_all_data_in_date_range(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)['items']
+    sentiment_list = []
+    chart_type_index = get_chart_type_index(chart_type=chart_type)
+    if chart_type_index is None:
+        return None
+    for item in items:
+        sentiment_list.append(item[chart_type_index])
+    x_label = f'{chart_type} list'
+    data = {'x': x_label, 'y': sentiment_list, 'type': 'violin', 'mode': 'markers'} # change color based on chart_type
+    layout = {'title': chart_type}
+    chart_data = {'data': [data], 'layout': layout}
+    return chart_data
 
 def calculate_average_sentiments(items):
     avg_compound = avg_pos = avg_neu = avg_neg = 0 

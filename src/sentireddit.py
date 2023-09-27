@@ -86,60 +86,33 @@ def analytics():
 def update_graph():
     context = {}
     chart_data = None
-    chart_type = request.form['chartType']
-    data_source = request.form['data-source-selection']
-    first_date = request.form['first-date']
-    second_date = request.form['second-date']
 
-    # if data sources not selected, then return nothing
-    if (utils.is_empty(chart_type) or utils.is_empty(data_source) or 
-        utils.is_empty(first_date) or utils.is_empty(second_date)):    
+    validated_form = utils.validate_analytics_form(request) 
+    if validated_form is None:
         return render_template('partials/chart.html', context=context, chart_data=chart_data)
-
-    if not (chart_type == 'Compound' or chart_type == 'Positive' or chart_type == 'Neutral' or chart_type == 'Negative'):
-        return render_template('partials/chart.html', context=context, chart_data=chart_data)
+    chart_type, data_source, first_date, second_date = validated_form
     
-    items = utils.get_all_data_in_date_range(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)['items']
-    sentiment_list = []
-    chart_type_index = utils.get_chart_type_index(chart_type=chart_type)
-    if chart_type_index is None:
+    chart_data = utils.generate_chart(chart_type=chart_type, first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)
+    if chart_data is None:
         return render_template('partials/chart.html', context=context, chart_data=chart_data)
-    for item in items:
-        sentiment_list.append(item[chart_type_index])
-    x_label = f'{chart_type} list'
-    data = {'x': x_label, 'y': sentiment_list, 'type': 'violin', 'mode': 'markers'} # change color based on chart_type
-    layout = {'title': chart_type}
-    chart_data = {'data': [data], 'layout': layout}
+
     return render_template('partials/chart.html', context=context, chart_data=chart_data)
 
 @app.route('/update_data_source', methods=['POST'])
 def update_data_source():
     context = {}
     chart_data = None
-    chart_type = request.form['chartType']
-    data_source = request.form['data-source-selection']
-    first_date = request.form['first-date']
-    second_date = request.form['second-date']
-
-    if (utils.is_empty(chart_type) or utils.is_empty(data_source) or 
-        utils.is_empty(first_date) or utils.is_empty(second_date)):    
+    
+    validated_form = utils.validate_analytics_form(request) 
+    if validated_form is None:
         return render_template('partials/analytics_metrics.html', context=context, chart_data=chart_data)
+    chart_type, data_source, first_date, second_date = validated_form
 
-    if not (chart_type == 'Compound' or chart_type == 'Positive' or chart_type == 'Neutral' or chart_type == 'Negative'):
-        return render_template('partials/analytics_metrics.html', context=context, chart_data=chart_data)
+    chart_data = utils.generate_chart(chart_type=chart_type, first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)
+    if chart_data is None:
+        return render_template('partials/chart.html', context=context, chart_data=chart_data)
     
     items = utils.get_all_data_in_date_range(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)['items']
-    sentiment_list = []
-    chart_type_index = utils.get_chart_type_index(chart_type=chart_type)
-    if chart_type_index is None:
-        return render_template('partials/chart.html', context=context, chart_data=chart_data)
-    for item in items:
-        sentiment_list.append(item[chart_type_index])
-    x_label = f'{chart_type} list'
-    data = {'x': x_label, 'y': sentiment_list, 'type': 'violin', 'mode': 'markers'} # change color based on chart_type
-    layout = {'title': chart_type}
-    chart_data = {'data': [data], 'layout': layout}
-
     context['avg_compound'], context['avg_pos'], context['avg_neu'], context['avg_neg'] = utils.calculate_average_sentiments(items)
     context['avg_compound'] = round(context['avg_compound'], 2)
     context['avg_pos'] = round(context['avg_pos'], 2)
