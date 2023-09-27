@@ -36,15 +36,21 @@ def get_chart_type_index(chart_type):
     return None
 
 def generate_chart(chart_type, first_date, second_date, data_source, auth_token):
-    items = get_all_data_in_date_range(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)['items']
+    fill_colors = {
+        'Compound': 'f3e8ff',
+        'Positive': 'dcfce7',
+        'Neutral': 'f1f5f9',
+        'Negative': 'fee2e2'
+    }
     sentiment_list = []
+    items = get_all_data_in_date_range(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)['items']
     chart_type_index = get_chart_type_index(chart_type=chart_type)
     if chart_type_index is None:
         return None
     for item in items:
         sentiment_list.append(item[chart_type_index])
     x_label = f'{chart_type} list'
-    data = {'x': x_label, 'y': sentiment_list, 'type': 'violin', 'mode': 'markers'} # change color based on chart_type
+    data = {'x': x_label, 'y': sentiment_list, 'type': 'violin', 'fillcolor': fill_colors[chart_type], 'line_color': 'black', 'mode': 'markers', 'points': 'all'}
     layout = {'title': chart_type}
     chart_data = {'data': [data], 'layout': layout}
     return chart_data
