@@ -10,6 +10,17 @@ def is_empty(x):
         return True
     return False
 
+def get_chart_type_index(chart_type):
+    if chart_type == 'Compound':
+        return 'compound'
+    if chart_type == 'Positive':
+        return 'pos'
+    if chart_type == 'Neutral':
+        return 'neu'
+    if chart_type == 'Negative':
+        return 'neg'
+    return None
+
 def calculate_average_sentiments(items):
     avg_compound = avg_pos = avg_neu = avg_neg = 0 
     if len(items) < 1:
@@ -50,6 +61,31 @@ def ordered_form_date_to_unix(first_date, second_date):
         return (second_date, first_date)
     return (first_date, second_date)
 
+def get_most_negative_data_record(first_date, second_date, data_source, auth_token):
+    dates = ordered_form_date_to_unix(first_date=first_date, second_date=second_date)
+    params = {
+        'sort': '+neg',
+        'perPage': '1',
+        'filter': f'(data_source=\'{data_source}\' && post_date >= {dates[0]} && post_date <= {dates[1]})'
+    }
+    response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
+                            params=params,
+                            headers={'Authorization': auth_token}).json() 
+    items = response['items']
+    return items[0]['body'] if items else 'N/A'
+
+def get_most_positive_data_record(first_date, second_date, data_source, auth_token):
+    dates = ordered_form_date_to_unix(first_date=first_date, second_date=second_date)
+    params = {
+        'sort': '-pos',
+        'perPage': '1',
+        'filter': f'(data_source=\'{data_source}\' && post_date >= {dates[0]} && post_date <= {dates[1]})'
+    }
+    response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
+                            params=params,
+                            headers={'Authorization': auth_token}).json() 
+    items = response['items']
+    return items[0]['body'] if items else 'N/A'
 
 def get_total_records(url, auth_token):
     params = { 'perPage': 1 }

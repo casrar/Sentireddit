@@ -76,61 +76,8 @@ def remove_data():
 def analytics():
     context = {}
     response = requests.get('http://127.0.0.1:8090/api/collections/data_source/records').json() 
-    data = {'x': 'compound list', 'y': [], 'type': 'violin', 'mode': 'markers'}
-    layout = {'title': 'Compound'}
-    # chart_data = {'data': [data], 'layout': layout}
     chart_data = None
     context['data_sources'] = response['items']
-
-
-    # if request.method == 'POST' and request.form['form-id'] == 'select-data-source':
-    #     # need to grab all data from response, I believe I am not grabbing it all
-        
-    #     first_date = int (dt.strptime(request.form['first-date'], '%Y-%m-%d').timestamp())
-    #     second_date = int (dt.strptime(request.form['second-date'], '%Y-%m-%d').timestamp())
-    #     params = {
-    #         'filter': f'(data_source=\'{request.form["data-source-selection"]}\' && post_date >= {first_date} && post_date <= {second_date})'
-    #     }
-    #     response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
-    #                             params=params,
-    #                             headers={'Authorization': auth_token}).json() 
-    #     items = response['items']
-
-    #     context['avg_compound'], context['avg_pos'], context['avg_neu'], context['avg_neg'] = utils.calculate_average_sentiments(items)
-    #     context['avg_compound'] = round(context['avg_compound'], 2)
-    #     context['avg_pos'] = round(context['avg_pos'], 2)
-    #     context['avg_neu'] = round(context['avg_neu'], 2) 
-    #     context['avg_neg'] = round(context['avg_neg'], 2) 
-        
-    #     context['summary'] = utils.sentiment_observation(context['avg_compound'])
-    #     compound_list = []
-    #     for item in items:
-    #         compound_list.append(item['compound'])
-    #     print(compound_list)
-    #     data = {'x': 'compound list', 'y': compound_list, 'type': 'violin', 'mode': 'markers', 'points': 'all'}
-    #     layout = {'title': 'Compound'}
-    #     chart_data = {'data': [data], 'layout': layout}
-
-    #     params = {
-    #         'sort': '-pos',
-    #         'perPage': '1',
-    #         'filter': f'(data_source=\'{request.form["data-source-selection"]}\' && post_date >= {first_date} && post_date <= {second_date})'
-    #     }
-    #     response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
-    #                             params=params,
-    #                             headers={'Authorization': auth_token}).json() 
-    #     items = response['items']
-    #     context['most_positive_post'] = items[0]['body'] if items else 'N/A'
-    #     params = {
-    #         'sort': '+neg',
-    #         'perPage': '1',
-    #         'filter': f'(data_source=\'{request.form["data-source-selection"]}\' && post_date >= {first_date} && post_date <= {second_date})'
-    #     }
-    #     response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
-    #                             params=params,
-    #                             headers={'Authorization': auth_token}).json() 
-    #     items = response['items']
-    #     context['most_negative_post'] = items[0]['body'] if items else 'N/A'
         
     return render_template('analytics.html', context=context, chart_data=chart_data)
 
@@ -147,28 +94,58 @@ def update_graph():
     # if data sources not selected, then return nothing
     if (utils.is_empty(chart_type) or utils.is_empty(data_source) or 
         utils.is_empty(first_date) or utils.is_empty(second_date)):    
-        return render_template('analytics.html', context=context, chart_data=chart_data)
-    
+        return render_template('partials/chart.html', context=context, chart_data=chart_data)
+
     if not (chart_type == 'Compound' or chart_type == 'Positive' or chart_type == 'Neutral' or chart_type == 'Negative'):
-        return render_template('analytics.html', context=context, chart_data=chart_data)
+        return render_template('partials/chart.html', context=context, chart_data=chart_data)
     
     items = utils.get_all_data_in_date_range(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)['items']
+    sentiment_list = []
+    chart_type_index = utils.get_chart_type_index(chart_type=chart_type)
+    if chart_type_index is None:
+        return render_template('partials/chart.html', context=context, chart_data=chart_data)
+    for item in items:
+        sentiment_list.append(item[chart_type_index])
     x_label = f'{chart_type} list'
-    data = {'x': x_label, 'y': items, 'type': 'violin', 'mode': 'markers'}
+    data = {'x': x_label, 'y': sentiment_list, 'type': 'violin', 'mode': 'markers'} # change color based on chart_type
     layout = {'title': chart_type}
     chart_data = {'data': [data], 'layout': layout}
-    return render_template('analytics.html', context=context, chart_data=chart_data)
+    return render_template('partials/chart.html', context=context, chart_data=chart_data)
 
 @app.route('/update_data_source', methods=['POST'])
 def update_data_source():
     context = {}
-    response = requests.get('http://127.0.0.1:8090/api/collections/data_source/records').json() 
-    data = {'x': 'compound list', 'y': [], 'type': 'violin', 'mode': 'markers'}
-    layout = {'title': 'Compound'}
-    # chart_data = {'data': [data], 'layout': layout}
     chart_data = None
-    context['data_sources'] = response['items']
-    # if data sources arent selected then dont return anything
-    # return updated data
-    print(request.form)
-    return render_template('analytics.html', context=context, chart_data=chart_data)
+    chart_type = request.form['chartType']
+    data_source = request.form['data-source-selection']
+    first_date = request.form['first-date']
+    second_date = request.form['second-date']
+
+    if (utils.is_empty(chart_type) or utils.is_empty(data_source) or 
+        utils.is_empty(first_date) or utils.is_empty(second_date)):    
+        return render_template('partials/analytics_metrics.html', context=context, chart_data=chart_data)
+
+    if not (chart_type == 'Compound' or chart_type == 'Positive' or chart_type == 'Neutral' or chart_type == 'Negative'):
+        return render_template('partials/analytics_metrics.html', context=context, chart_data=chart_data)
+    
+    items = utils.get_all_data_in_date_range(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)['items']
+    sentiment_list = []
+    chart_type_index = utils.get_chart_type_index(chart_type=chart_type)
+    if chart_type_index is None:
+        return render_template('partials/chart.html', context=context, chart_data=chart_data)
+    for item in items:
+        sentiment_list.append(item[chart_type_index])
+    x_label = f'{chart_type} list'
+    data = {'x': x_label, 'y': sentiment_list, 'type': 'violin', 'mode': 'markers'} # change color based on chart_type
+    layout = {'title': chart_type}
+    chart_data = {'data': [data], 'layout': layout}
+
+    context['avg_compound'], context['avg_pos'], context['avg_neu'], context['avg_neg'] = utils.calculate_average_sentiments(items)
+    context['avg_compound'] = round(context['avg_compound'], 2)
+    context['avg_pos'] = round(context['avg_pos'], 2)
+    context['avg_neu'] = round(context['avg_neu'], 2) 
+    context['avg_neg'] = round(context['avg_neg'], 2) 
+    context['summary'] = utils.sentiment_observation(context['avg_compound'])
+    context['most_positive_post'] = utils.get_most_positive_data_record(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)
+    context['most_negative_post'] = utils.get_most_negative_data_record(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)
+    return render_template('partials/analytics_metrics.html', context=context, chart_data=chart_data)
