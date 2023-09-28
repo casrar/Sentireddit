@@ -50,7 +50,7 @@ def generate_chart(chart_type, first_date, second_date, data_source, auth_token)
     for item in items:
         sentiment_list.append(item[chart_type_index])
     x_label = f'{chart_type} list'
-    data = {'x': x_label, 'y': sentiment_list, 'type': 'violin', 'fillcolor': fill_colors[chart_type], 'line_color': 'black', 'mode': 'markers', 'points': 'all'}
+    data = {'x': x_label, 'y': sentiment_list, 'type': 'violin', 'fillcolor': fill_colors[chart_type], 'mode': 'markers', 'points': 'all'}
     layout = {'title': chart_type}
     chart_data = {'data': [data], 'layout': layout}
     return chart_data
