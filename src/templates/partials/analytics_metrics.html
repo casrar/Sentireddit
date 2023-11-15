@@ -1,12 +1,3 @@
-{% extends "base.html" %}
-{% block head %}
-{{ super() }}
-{% endblock %}
-{% block navigation %}
-{{ super() }}
-{% endblock %}
-{% block content %}
-<form id="analytics-form" action="/analytics" method="POST">
 <div id="analytics" class="grid grid-cols-2 my-8">
     <div class="flex flex-col space-y-8 ml-8 p-4 border border-solid border-2 bg-white border-black shadow-2xl rounded-lg">
         <div id="plotly-chart">
@@ -16,6 +7,7 @@
         </div>
                 <div class="flex flex-row justify-center space-x-4">
                     <label>
+                        <!-- <input hx-post="/update_graph" hx-target="#plotly-chart" type="radio" class="accent-purple-400" name="chartType" value="Compound" required> -->
                         <input checked hx-post="/update_graph" hx-target="#plotly-chart" type="radio" class="accent-purple-400" name="chartType" value="Compound" >
                         Compound
                     </label><br>
@@ -120,29 +112,7 @@
         </div>
     </div>
 </div>
-<!-- check if no data sources, if none tell user -->
-<div class="mt-20 w-full flex justify-center">
-    <div class="w-fit bg-white border border-solid border-black border-2 rounded-lg flex flex-col self-center items-center p-2">
-            <div class="flex flex-row items-center space-x-4">
-                <!-- <input type="hidden" name="form-id" value="select-data-source"> -->
-                <select hx-post="/update_data_source" hx-swap="outerHTML" hx-target="#analytics" class="bg-white" name="data-source-selection" id="data-source-selection" required> 
-                    <option value="" selected disabled hidden>Select Data Source....</option>
-                    {% for item in context['data_sources'] %} 
-                        <option value="{{ item['id'] }}" required>
-                            r/{{ item['subreddit']}} : {{ item['search_term'] }} 
-                        </option>
-                    {% endfor %}
-                </select>  
-                <div>           
-                    <input type="hidden" name="form-id" value="select-date">
-                    <input hx-post="/update_data_source" hx-swap="outerHTML" hx-target="#analytics"  id="first-date" type="date" name="first-date" required/>
-                    <input hx-post="/update_data_source" hx-swap="outerHTML" hx-target="#analytics" id="second-date" type="date" name="second-date" required/>
-                </div>
-            </div>   
-    </div>
-</div>
-</form>
-{% endblock %}
-{% block footer %}
-{{ super() }}
-{% endblock %}
+<script>
+    var chart_data = {{ chart_data | tojson | safe }};
+    Plotly.newPlot('plotly-chart', chart_data['data'], chart_data['layout']);
+</script>
