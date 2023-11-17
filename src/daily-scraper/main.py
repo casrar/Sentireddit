@@ -49,57 +49,33 @@ for data_source in data_sources:
     subreddit = reddit.subreddit(subreddit_name) # if subreddit does not exist, breaking error
     submissions = []
 
-    for submission in subreddit.search(query=keyword, sort='comments', time_filter='day'): # set to day, testing all
-        submissions.append(submission.comments)
+    # Create CF worker to grab comments
+        # format for URL https://www.reddit.com/r/{subreddit}/search/?q={search_term}&restrict_sr=1&type=comment&sort=new
+        # hitting url, returns web page, need to scrape highlighted comments in below format
+            # <div class="Comment t1_{id} P8SGAKMtRxNwlmLz1zdJu _1z5rdmX8TDr6mqwNv7A70U _3nqqnHjXPJkfr8j5t_I85P">
+        # Need to get the link for the single comment highlight
+        # Then visit the .json page
+        # grab the needed meta data (post date, etc)
+
+
+    # Use Python to call CF worker
+    # CF worker runs through tasks
+    # Perform SA on CF data
+    # Push to DB
+
+    # matches = []
+    # #loop over all matches
+    # for match in matches:                 
+    #     data = {
+    #         'body': match.body, 
+    #         'post_id': match.id, 
+    #         'data_source': data_source_id,
+    #         'post_date': match.created_utc, 
+    #         'compound': match.sentiment_analysis['compound'],
+    #         'pos': match.sentiment_analysis['pos'],
+    #         'neu': match.sentiment_analysis['neu'],
+    #         'neg': match.sentiment_analysis['neg']
+    #         }
+    #     response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=data, headers={'Authorization': auth_token}).json()
     
-    for i in range(len(submissions)):
-        more_comments = submissions[i].replace_more(limit=None)
-        while len(more_comments) > 0:
-            try:
-                more_comments = submissions[i].replace_more(limit=None)
-                break
-            except PossibleExceptions:
-                print("Handling replace_more exception") # replace with logging
-                sleep(1)
-        submissions[i] = submissions[i].list()
-
-    response = requests.get(
-        f"http://127.0.0.1:8090/api/collections/data/records?sort=-post_date&filter=(data_source=\'{data_source_id}\')", # do this better
-        headers={'Authorization': auth_token}).json() 
-
-    timestamp = 0 
-    if response['totalItems'] > 0:  
-        timestamp = response['items'][0]['post_date']  
-
-    filtered_comments = []
-    new_timestamp = timestamp
-    for comment_list in submissions: # Not ideal, but can be refactored
-        for comment in comment_list: 
-            if comment.created_utc > timestamp: 
-                filtered_comments.append(comment)   
-            if comment.created_utc > new_timestamp:
-                new_timestamp = comment.created_utc
-            
-
-    matches = []
-    total_comments = len(filtered_comments)
-    for comment in filtered_comments: 
-        if comment.body.find(keyword) != -1: # Edit logic to account for case sensitivity 
-            matches.append(comment)
-            comment.sentiment_analysis = sia.polarity_scores(comment.body)
-
-    #loop over all matches
-    for match in matches:                 
-        data = {
-            'body': match.body, 
-            'post_id': match.id, 
-            'data_source': data_source_id,
-            'post_date': match.created_utc, 
-            'compound': match.sentiment_analysis['compound'],
-            'pos': match.sentiment_analysis['pos'],
-            'neu': match.sentiment_analysis['neu'],
-            'neg': match.sentiment_analysis['neg']
-            }
-        response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=data, headers={'Authorization': auth_token}).json()
-    
-    print(f'Found: {len(matches)} / {total_comments}')
+    # print(f'Found: {len(matches)} / {total_comments}')

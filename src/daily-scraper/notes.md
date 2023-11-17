@@ -1,0 +1,12 @@
+- gql.reddit.com 
+    - GraphQL endpoint for Reddit
+    - XHR requests are typically aimed here
+    - Uses 'id' in request to define what type of action
+        - e39d1d540f0a 
+            - Provides search functionality, called every time search bar is interfaced with (e.g. clicked, typed in)
+            - Response returns Subreddits and Profiles matching your search 
+        - 2c3efcfc2552
+            - Unknown functionality, pairs with e39d1d540f0a during search bar interface
+        - 6c87f86c5706
+            - Provides the comment search
+            - Response returns searched query with comment filter
