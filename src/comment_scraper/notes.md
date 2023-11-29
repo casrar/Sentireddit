@@ -125,7 +125,7 @@
             - ```https://www.reddit.com/r/redditdev/search/?q=creating&type=comment``
                 - ```/>  <faceplate-partial loading="lazy" src="/svc/shreddit/r/redditdev/search/?q=creating&amp;type=comment&amp;commentsCursor=MjQ%3D"``>
             - ```https://www.reddit.com/svc/shreddit/r/redditdev/search/?q=creating&type=comment&commentsCursor=MjQ%3D```
-            - the post is stored in ````#search-comment-t1_jeyb0s0-post-rtjson-content``` and time in ```faceplate-timeago
-```
+            - the post is stored in ````#search-comment-t1_jeyb0s0-post-rtjson-content``` and time in ```faceplate-timeago```
+        - Don't even need to hit the initial page, can directly hit the partials search, just look for the faceplate partial loading
 
 
