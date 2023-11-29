@@ -34,7 +34,7 @@
                     },
                     {
                         "name": "Authorization",
-                        "value": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IlNIQTI1NjpzS3dsMnlsV0VtMjVmcXhwTU40cWY4MXE2OWFFdWFyMnpLMUdhVGxjdWNZIiwidHlwIjoiSldUIn0.eyJzdWIiOiJ1c2VyIiwiZXhwIjoxNzAxMzI2NjAxLjc0OTY4OSwiaWF0IjoxNzAxMjQwMjAxLjc0OTY4OSwianRpIjoiT1l2MjI5UVFUcms3VU96REZZX3lNWkViR2hLM093IiwiY2lkIjoiOXRMb0Ywc29wNVJKZ0EiLCJsaWQiOiJ0Ml9xbmViaWt0IiwiYWlkIjoidDJfcW5lYmlrdCIsImxjYSI6MTUxNTAwMTgzNTg1Mywic2NwIjoiZUp4a2tkR090REFJaGQtbDF6N0JfeXBfTmh0c2NZYXNMUWFvazNuN0RWb2NrNzN5d1BuYXd2Rl9ncHk1TjB0VHlvS2xrR21hRWhieXpySUNTWnJTazlSWTNtbEtWTEFabWN1VmRxelE0SUZwU3BWTDVyYlE0OUltTkhkajBiTVRWMVV1S3ctcUFxMm5hbXpqRnJZbnhwbU4xWVpVWEpkVG1jQ3lVRDZMRl8yUXE3ZjItVFA5SnJTRFlVVlZlS0IzQktFY240M0ZGMVBZX1QwMTZkbTZZRkY3cndlcGZhN0g3dHBuelVLemNfczVucjgya25FNUxzMVBzSDkzX1JJNjhNanpNcU1PWU1RYWZwUmhSOWJoWDNVQWxRc0tHRXNRbjBZZ1Z5N2Zfa3V3WFpQLU5XNUhmUEhOaUp2ZThGc3pVTThsaUVPZnh0ZHZBQUFBX18tQ3lkUW4iLCJyY2lkIjoieWVxY0VndzdycWJvYU52WjRXdzdkUTZlM1BPN2w5NkJOUVpzQkVoUS1rTSIsImZsbyI6Mn0.PH4Wf6uR3ODuvy0le0ZF4ZTnA8MB-jcacSqIPL5qbLNZrIe1PNDlE5ZtmFOlAyAwVJqsZSgFD475a10L7I_1_D3suizYr9TelPEqmV4VHkzKFmH-4enBOlVJKVUQn_Itp_iDaboKKvUrwzEjB-9IIG6RBey18NymYd1vu8DLvjhQEIbR4qqeN_viBPYzcJ_xRrzuqzEB_iCfO89onwYXTZBzCijXkeYRjpa6lYCGNfcnaasaelqwunpSDlpKJU-JofcWrHnc7ncnZ7Gp_p4Ia-bQmKWg1yZKCy1XQh0vX813swNGYWo-mBd-qt5ksxx2vQvLJfP4zwtWErOuyqbmLw"
+                        "value": "Bearer {value}"
                     },
                     {
                         "name": "Cache-Control",
@@ -98,11 +98,11 @@
                     },
                     {
                         "name": "x-reddit-loid",
-                        "value": "00000000000qnebikt.2.1515001835853.Z0FBQUFBQmtyeURPNG9xZ2hXTE84dG14T21SWlVRVEFGMzZzRE9GNW1pVmpMRjVLZ0hoT1JTVUN5cjNtNFdnZkl5SERWSVFXdmZFYTlaT29pS254b1VaNVM3SnFuQlBscVhBYUtvYjYwMmxfZW5jU2pscm1FSmc0TEtpTE9pcXFkYkhyY1NQNlA4RUo"
+                        "value": "{value}"
                     },
                     {
                         "name": "x-reddit-session",
-                        "value": "igjmhebadjpeppldoh.0.1701241275130.Z0FBQUFBQmxadUc3aDlrYmc1bGFGZmdkVkluejJST21iTk9CZnEwU3NIb1RRZXNqZzVUNjNqQ09RU2wyNjJoSnhHaml3YTJmZ3czSzNDdW80VzVOZjRoNFV1NWxOWlFlazZNQWtFbWxvZUpBaVVzeGtmcjd5LU5ORmVSRGJQbk01dGRyd2ZROWJFWHY"
+                        "value": "{value}"
                     }
                 ]
             }
@@ -119,3 +119,13 @@
     - Become familar with the proxy tool
     - I forsee the tokens and the proxy tool becoming an issue, may need to figure something out to automatically grab and update bearer 
     - for some reason i dont use the GQL api on incognito browser, need more research
+    - GQl endpoint only works if you are logged in
+        - There is a way around it with partials and normal scraping; hit the normal endpoint, then grab url in ```<faceplate-partial loading="lazy"```, 
+        continue to grab ```<faceplate-partial loading="lazy" on each page```, grab individual comments and post data 
+            - ```https://www.reddit.com/r/redditdev/search/?q=creating&type=comment``
+                - ```/>  <faceplate-partial loading="lazy" src="/svc/shreddit/r/redditdev/search/?q=creating&amp;type=comment&amp;commentsCursor=MjQ%3D"``>
+            - ```https://www.reddit.com/svc/shreddit/r/redditdev/search/?q=creating&type=comment&commentsCursor=MjQ%3D```
+            - the post is stored in ````#search-comment-t1_jeyb0s0-post-rtjson-content``` and time in ```faceplate-timeago
+```
+
+
