@@ -63,14 +63,13 @@ config = dotenv_values(".env")
 
 # Class testing
 # as of right now, this is in a good state, leaving this for notes
-from GQLNewCommentIterator import GQLNewCommentIterator
+from RedditNewCommentIterator import RedditNewCommentIterator
 
-gcni = GQLNewCommentIterator(search_term='smell', proxy_url='', subreddit='redditdev')
+gcni = RedditNewCommentIterator(query='smell', proxy_url='', subreddit='redditdev')
 print(gcni.__iter__())
-edges = gcni.__next__()
-temp = []
-for edge in edges:
-    temp.append({'content': f"{edge['node']['content']['markdown']}", 'created': f"{edge['node']['createdAt']}"})
+posts = gcni.__next__()
+print(gcni._RedditNewCommentIterator__reddit_partial_url)
+
 file_path = "comment_scraper/temp.txt"
 with open(file_path, 'w') as file:
-    file.write(str(temp))
+    file.write(str(posts))
