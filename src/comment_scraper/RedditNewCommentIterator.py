@@ -8,7 +8,6 @@ class RedditNewCommentIterator:
         # will be using scrapeops
         self.__query=query
         self.__subreddit=subreddit
-        # self.__comments_cursor='' 
         self.__headers=None
         self.__proxy_url=proxy_url
         self.__reddit_origin_url='https://www.reddit.com'
