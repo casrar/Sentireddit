@@ -12,7 +12,7 @@ class RedditNewCommentIterator:
         self.__headers=None
         self.__proxy_url=proxy_url
         self.__reddit_origin_url='https://www.reddit.com'
-        self.__reddit_partial_url=f'/svc/shreddit/r/{self.__subreddit}/search/?q={self.__query}&type=comment&sort=new' # use urllib.parse.quote
+        self.__reddit_partial_url=f'/svc/shreddit/r/{self.__subreddit}/search/?q={self.__query}&type=comment&sort=new'
         self.__last_iteration=False
     
     def __iter__(self):
@@ -21,7 +21,7 @@ class RedditNewCommentIterator:
     def __next__(self):
         if self.__last_iteration:
             raise StopIteration
-        headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0'}
+        headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0'} # this will be handled by scrapeops
         response = requests.get(url=self.__reddit_origin_url+self.__reddit_partial_url, headers=headers)
         try:
             response.raise_for_status()
