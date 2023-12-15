@@ -1,6 +1,7 @@
 import requests
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
+import json
 
 
 class RedditNewCommentIterator:
@@ -22,31 +23,39 @@ class RedditNewCommentIterator:
             raise StopIteration
         headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0'}
         response = requests.get(url=self.__reddit_origin_url+self.__reddit_partial_url, headers=headers)
-        #check response
-        # if response.status_code != 200:
-        #if error code, raise error
-        response = response.text
-        soup = BeautifulSoup(response, 'html.parser')
-        comments = self.__format_comments__(soup)
-        self.__reddit_partial_url = self.__get_next_reddit_partial_url__(soup)
-        return comments
-    
+        try:
+            response.raise_for_status()
+            response = response.text
+            soup = BeautifulSoup(response, 'html.parser')
+            comments = self.__format_comments__(soup)
+            self.__reddit_partial_url = self.__get_next_reddit_partial_url__(soup)
+            return comments
+        except requests.exceptions.HTTPError as err:
+            # replace with log
+            print('error')
+       
     def __format_comments__(self, soup):
         comments = soup.find_all(attrs={'data-testid':'search-comment'})
-        # this contains both the timestamp for the comment t3, and the post data has id=search-comment-{t1_id}-post-rtjson-content, im not sure about duplicates
-
-        #todo
-            # create a model for how i want the comments returned
-            # figure out how to destructure the <p> tags for the comment content
-
-        # iterate over top level 'data-testid':'search-comment' tags
-            # grab the timestamp created
-            # grab the t3 id
-            # find id=search-comment-{t1_id}-post-rtjson-content and append all <p> tags to data structure
-        
-        # return list
-        return comments
+        formatted_comments = []
+        for comment in comments:
+            post_info = comment.attrs
+            comment_info = json.loads(post_info['data-faceplate-tracking-context'])
+            comment_info = comment_info['comment']
+            comment_id = comment_info['id']
+            timestamp = comment_info['created_timestamp']
+            comment_body = comment.find_all(id=f'search-comment-{comment_id}-post-rtjson-content')
+            comment_body = self.__extract_comment_body__(comment_body)
+            formatted_comments.append((self.__subreddit,comment_body, comment_id, timestamp))
+        return formatted_comments
     
+    def __extract_comment_body__(self, comment_tags):
+        root_tag = comment_tags[0]
+        p_tags = root_tag.find_all('p')
+        comment_body = ""
+        for p in p_tags:
+            comment_body = comment_body + p.text
+        return comment_body
+
     def __get_next_reddit_partial_url__(self, soup):
         reddit_partial_url=soup.find(name='faceplate-partial', attrs={'loading':'lazy'})
         if reddit_partial_url is None:
