@@ -1,38 +1,54 @@
 import requests
-from urllib.parse import urlparse
+from urllib.parse import urlencode
 from bs4 import BeautifulSoup
 import json
 
 
 class RedditNewCommentIterator:
-    def __init__(self, query, subreddit, proxy_url):
-        # will be using scrapeops
+    def __init__(self, query, subreddit, proxy_url, api_key):
         self.__query=query
         self.__subreddit=subreddit
-        self.__headers=None
+        self.__api_key=api_key
         self.__proxy_url=proxy_url
         self.__reddit_origin_url='https://www.reddit.com'
         self.__reddit_partial_url=f'/svc/shreddit/r/{self.__subreddit}/search/?q={self.__query}&type=comment&sort=new'
         self.__last_iteration=False
+        self.__proxy_params = {
+            'api_key': self.__api_key,
+            'url': self.__reddit_origin_url + self.__reddit_partial_url
+        }
     
+    def __scrape(self): 
+        ## test version
+        response = requests.get(url=self.__reddit_origin_url + self.__reddit_partial_url)
+        return response.text
+
+        ## live version 
+        # response = requests.get(
+        #     url=self.__proxy_url,
+        #     params=urlencode(self.__proxy_params),
+        # )
+        # try:
+        #     response.raise_for_status()
+        #     response = response.text
+        #     return response
+        # except requests.exceptions.HTTPError as err:
+        #     # handle out of credits 
+        #     # replace with log
+        #     print('error')
+
     def __iter__(self):
         return self
     
     def __next__(self):
         if self.__last_iteration:
             raise StopIteration
-        headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:69.0) Gecko/20100101 Firefox/69.0'} # this will be handled by scrapeops
-        response = requests.get(url=self.__reddit_origin_url+self.__reddit_partial_url, headers=headers)
-        try:
-            response.raise_for_status()
-            response = response.text
-            soup = BeautifulSoup(response, 'html.parser')
-            comments = self.__format_comments__(soup)
-            self.__reddit_partial_url = self.__get_next_reddit_partial_url__(soup)
-            return comments
-        except requests.exceptions.HTTPError as err:
-            # replace with log
-            print('error')
+        self.__proxy_params['url'] = self.__reddit_origin_url + self.__reddit_partial_url
+        page = self.__scrape()
+        soup = BeautifulSoup(page, 'html.parser')
+        comments = self.__format_comments__(soup)
+        self.__reddit_partial_url = self.__get_next_reddit_partial_url__(soup)
+        return comments
        
     def __format_comments__(self, soup):
         comments = soup.find_all(attrs={'data-testid':'search-comment'})
@@ -63,4 +79,6 @@ class RedditNewCommentIterator:
             return None
         reddit_partial_url = reddit_partial_url.attrs['src']
         return reddit_partial_url
+    
+    
 
