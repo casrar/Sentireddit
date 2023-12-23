@@ -13,59 +13,120 @@ SUBREDDIT = 0
 QUERY = 1
 DATA_SOURCE_ID = 2
 COMMENT_BODY = 0
-POST_ID = 1
+COMMENT_POST_ID = 1
 COMMENT_ID = 2
 COMMENT_CREATED_TIMESTAMP = 3
 
-config = dotenv_values(".env")
-sia = SentimentIntensityAnalyzer()
+def auth_to_db(config):
+    # error check and log
+    response = requests.post(
+        'http://127.0.0.1:8090/api/collections/users/auth-with-password', 
+        data={'identity': config['IDENTITY'], 'password': config['PASSWORD']}).json()
+    auth_token = response['token']
+    return auth_token
 
-# error check and log
-response = requests.post(
-    'http://127.0.0.1:8090/api/collections/users/auth-with-password', 
-    data={'identity': config['IDENTITY'], 'password': config['PASSWORD']}).json()
-auth_token = response['token']
 
-# error check and log
-response = requests.get(
-    'http://127.0.0.1:8090/api/collections/data_source/records', 
-    headers={'Authorization': auth_token}).json()
-
-data_sources = []
-for i in range(response['totalItems']):
-    data_sources.append(
-        (response['items'][i]['subreddit'], 
-        response['items'][i]['search_term'],
-        response['items'][i]['id'])) 
-
-for data_source in data_sources:
-    comments = RedditNewCommentIterator(subreddit=data_source[SUBREDDIT], query=data_source[QUERY],
-                                proxy_url='https://proxy.scrapeops.io/v1/', api_key=config['SCRAPE_OPS_KEY'])
-    recent_timestamp = 0
-    params = {'sort':'-post_date', 'filter': f'(data_source={data_source[DATA_SOURCE_ID]})'}
+def get_data_sources(auth_token):
+    # error check and log
     response = requests.get(
         'http://127.0.0.1:8090/api/collections/data_source/records', 
+        headers={'Authorization': auth_token}).json()
+
+    data_sources = []
+    for i in range(response['totalItems']):
+        data_sources.append(
+            (response['items'][i]['subreddit'], 
+            response['items'][i]['query'],
+            response['items'][i]['id'])) 
+    return data_sources
+
+
+# for data_source in data_sources:
+#     comments = RedditNewCommentIterator(subreddit=data_source[SUBREDDIT], query=data_source[QUERY],
+#                                 proxy_url='https://proxy.scrapeops.io/v1/', api_key=config['SCRAPE_OPS_KEY'])
+#     recent_timestamp = -1
+#     recent_comment_id = -1
+#     params = {'sort':'-post_date', 'filter': f'(data_source={data_source[DATA_SOURCE_ID]})'}
+#     response = requests.get(
+#         'http://127.0.0.1:8090/api/collections/data/records', 
+#         headers={'Authorization': auth_token}, params=params).json()
+#     if response['totalItems'] > 0:  
+#         recent_timestamp = response['items'][0]['post_date']
+#         recent_comment_id = response['items'][0]['comment_id']
+#     for comment in comments:
+#         curr_timestamp = comment[COMMENT_CREATED_TIMESTAMP]
+#         curr_comment_id = comment[COMMENT_ID]
+#         if curr_timestamp <= recent_timestamp or curr_comment_id == recent_comment_id: 
+#             break
+#         recent_timestamp = curr_timestamp
+#         recent_comment_id = curr_comment_id
+#         sentiment = sia.polarity_scores(comment[COMMENT_BODY])
+#         data = {
+#             'id': 'RECORD_ID',
+#             'body': comment[COMMENT_BODY],
+#             'post_id': comment[COMMENT_POST_ID],
+#             'comment_id': comment[COMMENT_ID],
+#             'created_timestamp': recent_timestamp,
+#             'data_source': data_source[id],
+#             'compound': sentiment['compound'],
+#             'pos': sentiment['post'],
+#             'neu': sentiment['neu'],
+#             'neg': sentiment['neg']
+#         }
+#         response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=data, headers={'Authorization': auth_token}).json()
+    
+
+def scrape_comments(data_source, auth_token, config):
+    comments = RedditNewCommentIterator(subreddit=data_source[SUBREDDIT], query=data_source[QUERY],
+                                proxy_url='https://proxy.scrapeops.io/v1/', api_key=config['SCRAPE_OPS_KEY'])
+    recent_timestamp = -1
+    recent_comment_id = -1
+    params = {'sort':'-created_timestamp', 'filter': f'(data_source=\'{data_source[DATA_SOURCE_ID]}\')'}
+    response = requests.get(
+        'http://127.0.0.1:8090/api/collections/data/records', 
         headers={'Authorization': auth_token}, params=params).json()
     if response['totalItems'] > 0:  
-        recent_timestamp = response['items'][0]['post_date']
+        recent_timestamp = response['items'][0]['created_timestamp']
+        recent_comment_id = response['items'][0]['comment_id']
+    data = []
     for comment in comments:
-        # get most recent timestamp, if hit, break
         curr_timestamp = comment[COMMENT_CREATED_TIMESTAMP]
-        if curr_timestamp <= recent_timestamp: # also check for same comment id 
+        curr_comment_id = comment[COMMENT_ID]
+        if curr_timestamp <= recent_timestamp or curr_comment_id == recent_comment_id: 
             break
-        recent_timestamp = curr_timestamp
-        sentiment = sia.sia.polarity_scores(comment[COMMENT_BODY])
-        data = {
-            'id': 'RECORD_ID',
+        comment = {
             'body': comment[COMMENT_BODY],
-            'post_id': comment[POST_ID],
+            'post_id': comment[COMMENT_POST_ID],
             'comment_id': comment[COMMENT_ID],
             'created_timestamp': recent_timestamp,
             'data_source': data_source[id],
-            'compound': sentiment['compound'],
-            'pos': sentiment['post'],
-            'neu': sentiment['neu'],
-            'neg': sentiment['neg']
         }
-        response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=data, headers={'Authorization': auth_token}).json()
-    
+        data.append(comment)
+    return data
+
+
+def analyze_comments(comments, SentimentIntensityAnalyzer):
+    for comment in comments:
+        sentiment = SentimentIntensityAnalyzer.polarity_scores(comment['body'])
+        comment['compound'] = sentiment['compound']
+        comment['pos'] = sentiment['pos']
+        comment['neu'] = sentiment['neu']
+        comment['neg'] = sentiment['neg']
+    return comments
+
+def post_comments_to_db(comments, auth_token):
+    for comment in comments:
+        response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=comment, headers={'Authorization': auth_token}).json()
+
+def main():
+    config = dotenv_values("../.env")
+    sia = SentimentIntensityAnalyzer()
+    auth_token = auth_to_db(config)
+    data_sources = get_data_sources(auth_token)
+    for data_source in data_sources:
+        comments = scrape_comments(data_source=data_source, auth_token=auth_token, config=config)
+        comments = analyze_comments(comments)
+        post_comments_to_db(comments=comments, auth_token=auth_token)
+
+if __name__ == "__main__":
+    main()
