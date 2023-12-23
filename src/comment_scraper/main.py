@@ -40,42 +40,6 @@ def get_data_sources(auth_token):
             response['items'][i]['id'])) 
     return data_sources
 
-
-# for data_source in data_sources:
-#     comments = RedditNewCommentIterator(subreddit=data_source[SUBREDDIT], query=data_source[QUERY],
-#                                 proxy_url='https://proxy.scrapeops.io/v1/', api_key=config['SCRAPE_OPS_KEY'])
-#     recent_timestamp = -1
-#     recent_comment_id = -1
-#     params = {'sort':'-post_date', 'filter': f'(data_source={data_source[DATA_SOURCE_ID]})'}
-#     response = requests.get(
-#         'http://127.0.0.1:8090/api/collections/data/records', 
-#         headers={'Authorization': auth_token}, params=params).json()
-#     if response['totalItems'] > 0:  
-#         recent_timestamp = response['items'][0]['post_date']
-#         recent_comment_id = response['items'][0]['comment_id']
-#     for comment in comments:
-#         curr_timestamp = comment[COMMENT_CREATED_TIMESTAMP]
-#         curr_comment_id = comment[COMMENT_ID]
-#         if curr_timestamp <= recent_timestamp or curr_comment_id == recent_comment_id: 
-#             break
-#         recent_timestamp = curr_timestamp
-#         recent_comment_id = curr_comment_id
-#         sentiment = sia.polarity_scores(comment[COMMENT_BODY])
-#         data = {
-#             'id': 'RECORD_ID',
-#             'body': comment[COMMENT_BODY],
-#             'post_id': comment[COMMENT_POST_ID],
-#             'comment_id': comment[COMMENT_ID],
-#             'created_timestamp': recent_timestamp,
-#             'data_source': data_source[id],
-#             'compound': sentiment['compound'],
-#             'pos': sentiment['post'],
-#             'neu': sentiment['neu'],
-#             'neg': sentiment['neg']
-#         }
-#         response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=data, headers={'Authorization': auth_token}).json()
-    
-
 def scrape_comments(data_source, auth_token, config):
     comments = RedditNewCommentIterator(subreddit=data_source[SUBREDDIT], query=data_source[QUERY],
                                 proxy_url='https://proxy.scrapeops.io/v1/', api_key=config['SCRAPE_OPS_KEY'])
@@ -90,6 +54,7 @@ def scrape_comments(data_source, auth_token, config):
         recent_comment_id = response['items'][0]['comment_id']
     data = []
     for comment in comments:
+        comment = comment[0] # unpacking from len(1) list
         curr_timestamp = comment[COMMENT_CREATED_TIMESTAMP]
         curr_comment_id = comment[COMMENT_ID]
         if curr_timestamp <= recent_timestamp or curr_comment_id == recent_comment_id: 
@@ -99,15 +64,15 @@ def scrape_comments(data_source, auth_token, config):
             'post_id': comment[COMMENT_POST_ID],
             'comment_id': comment[COMMENT_ID],
             'created_timestamp': recent_timestamp,
-            'data_source': data_source[id],
+            'data_source': data_source[DATA_SOURCE_ID],
         }
         data.append(comment)
     return data
 
 
-def analyze_comments(comments, SentimentIntensityAnalyzer):
+def analyze_comments(comments, sentiment_intensity_analyzer):
     for comment in comments:
-        sentiment = SentimentIntensityAnalyzer.polarity_scores(comment['body'])
+        sentiment = sentiment_intensity_analyzer.polarity_scores(comment['body'])
         comment['compound'] = sentiment['compound']
         comment['pos'] = sentiment['pos']
         comment['neu'] = sentiment['neu']
@@ -125,7 +90,7 @@ def main():
     data_sources = get_data_sources(auth_token)
     for data_source in data_sources:
         comments = scrape_comments(data_source=data_source, auth_token=auth_token, config=config)
-        comments = analyze_comments(comments)
+        comments = analyze_comments(comments=comments, sentiment_intensity_analyzer=sia)
         post_comments_to_db(comments=comments, auth_token=auth_token)
 
 if __name__ == "__main__":
