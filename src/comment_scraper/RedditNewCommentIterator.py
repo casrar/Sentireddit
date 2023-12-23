@@ -5,11 +5,11 @@ import json
 
 
 class RedditNewCommentIterator:
-    def __init__(self, query, subreddit, proxy_url, api_key):
-        self.__query=query
+    def __init__(self, subreddit, query, proxy_url, api_key):
         self.__subreddit=subreddit
-        self.__api_key=api_key
+        self.__query=query
         self.__proxy_url=proxy_url
+        self.__api_key=api_key
         self.__reddit_origin_url='https://www.reddit.com'
         self.__reddit_partial_url=f'/svc/shreddit/r/{self.__subreddit}/search/?q={self.__query}&type=comment&sort=new'
         self.__last_iteration=False
@@ -20,8 +20,16 @@ class RedditNewCommentIterator:
     
     def __scrape(self): 
         ## test version
-        response = requests.get(url=self.__reddit_origin_url + self.__reddit_partial_url)
-        return response.text
+        try:
+            response = requests.get(url=self.__reddit_origin_url + self.__reddit_partial_url)
+            response.raise_for_status()
+            response = response.text
+            return response
+        except requests.exceptions.HTTPError as err:
+            # handle out of credits 
+            # replace with log
+            return err
+        
 
         ## live version 
         # response = requests.get(
@@ -45,6 +53,7 @@ class RedditNewCommentIterator:
             raise StopIteration
         self.__proxy_params['url'] = self.__reddit_origin_url + self.__reddit_partial_url
         page = self.__scrape()
+        # check for errors
         soup = BeautifulSoup(page, 'html.parser')
         comments = self.__format_comments__(soup)
         self.__reddit_partial_url = self.__get_next_reddit_partial_url__(soup)
@@ -56,12 +65,13 @@ class RedditNewCommentIterator:
         for comment in comments:
             post_info = comment.attrs
             comment_info = json.loads(post_info['data-faceplate-tracking-context'])
+            post_id = comment_info['post_id']
             comment_info = comment_info['comment']
             comment_id = comment_info['id']
             timestamp = comment_info['created_timestamp']
             comment_body = comment.find_all(id=f'search-comment-{comment_id}-post-rtjson-content')
             comment_body = self.__extract_comment_body__(comment_body)
-            formatted_comments.append((self.__subreddit,comment_body, comment_id, timestamp))
+            formatted_comments.append((comment_body, post_id, comment_id, timestamp))
         return formatted_comments
     
     def __extract_comment_body__(self, comment_tags):

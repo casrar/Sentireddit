@@ -6,13 +6,18 @@ import json
 import time
 from nltk.sentiment import SentimentIntensityAnalyzer
 from dotenv import dotenv_values
+from RedditNewCommentIterator import RedditNewCommentIterator
+
+# CONSTS
+SUBREDDIT = 0
+QUERY = 1
+DATA_SOURCE_ID = 2
+COMMENT_BODY = 0
+POST_ID = 1
+COMMENT_ID = 2
+COMMENT_CREATED_TIMESTAMP = 3
 
 config = dotenv_values(".env")
-
-# constants
-KEY = 0
-VALUE = 1
-
 sia = SentimentIntensityAnalyzer()
 
 # error check and log
@@ -33,49 +38,34 @@ for i in range(response['totalItems']):
         response['items'][i]['search_term'],
         response['items'][i]['id'])) 
 
-reddit = praw.Reddit(
-    client_id = config['CLIENT_ID'],
-    client_secret = config['CLIENT_SECRET'],
-    user_agent = config['USER_AGENT'],
-    ratelimit_seconds = config['RATELIMIT_SECONDS']
-)
-
-# REFACTOR 
 for data_source in data_sources:
-    print(data_source)
-    subreddit_name = data_source[KEY]
-    keyword = data_source[VALUE]
-    data_source_id = data_source[2]
-    subreddit = reddit.subreddit(subreddit_name) # if subreddit does not exist, breaking error
-    submissions = []
-
-    # Create CF worker to grab comments
-        # format for URL https://www.reddit.com/r/{subreddit}/search/?q={search_term}&restrict_sr=1&type=comment&sort=new
-        # hitting url, returns web page, need to scrape highlighted comments in below format
-            # <div class="Comment t1_{id} P8SGAKMtRxNwlmLz1zdJu _1z5rdmX8TDr6mqwNv7A70U _3nqqnHjXPJkfr8j5t_I85P">
-        # Need to get the link for the single comment highlight
-        # Then visit the .json page
-        # grab the needed meta data (post date, etc)
-
-
-    # Use Python to call CF worker
-    # CF worker runs through tasks
-    # Perform SA on CF data
-    # Push to DB
-
-    # matches = []
-    # #loop over all matches
-    # for match in matches:                 
-    #     data = {
-    #         'body': match.body, 
-    #         'post_id': match.id, 
-    #         'data_source': data_source_id,
-    #         'post_date': match.created_utc, 
-    #         'compound': match.sentiment_analysis['compound'],
-    #         'pos': match.sentiment_analysis['pos'],
-    #         'neu': match.sentiment_analysis['neu'],
-    #         'neg': match.sentiment_analysis['neg']
-    #         }
-    #     response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=data, headers={'Authorization': auth_token}).json()
+    comments = RedditNewCommentIterator(subreddit=data_source[SUBREDDIT], query=data_source[QUERY],
+                                proxy_url='https://proxy.scrapeops.io/v1/', api_key=config['SCRAPE_OPS_KEY'])
+    recent_timestamp = 0
+    params = {'sort':'-post_date', 'filter': f'(data_source={data_source[DATA_SOURCE_ID]})'}
+    response = requests.get(
+        'http://127.0.0.1:8090/api/collections/data_source/records', 
+        headers={'Authorization': auth_token}, params=params).json()
+    if response['totalItems'] > 0:  
+        recent_timestamp = response['items'][0]['post_date']
+    for comment in comments:
+        # get most recent timestamp, if hit, break
+        curr_timestamp = comment[COMMENT_CREATED_TIMESTAMP]
+        if curr_timestamp <= recent_timestamp: # also check for same comment id 
+            break
+        recent_timestamp = curr_timestamp
+        sentiment = sia.sia.polarity_scores(comment[COMMENT_BODY])
+        data = {
+            'id': 'RECORD_ID',
+            'body': comment[COMMENT_BODY],
+            'post_id': comment[POST_ID],
+            'comment_id': comment[COMMENT_ID],
+            'created_timestamp': recent_timestamp,
+            'data_source': data_source[id],
+            'compound': sentiment['compound'],
+            'pos': sentiment['post'],
+            'neu': sentiment['neu'],
+            'neg': sentiment['neg']
+        }
+        response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=data, headers={'Authorization': auth_token}).json()
     
-    # print(f'Found: {len(matches)} / {total_comments}')
