@@ -68,10 +68,10 @@ class RedditNewCommentIterator:
             post_id = comment_info['post_id']
             comment_info = comment_info['comment']
             comment_id = comment_info['id']
-            timestamp = comment_info['created_timestamp']
+            created_timestamp = comment_info['created_timestamp']
             comment_body = comment.find_all(id=f'search-comment-{comment_id}-post-rtjson-content')
             comment_body = self.__extract_comment_body__(comment_body)
-            formatted_comments.append((comment_body, post_id, comment_id, timestamp))
+            formatted_comments.append((comment_body, post_id, comment_id, created_timestamp))
         return formatted_comments
     
     def __extract_comment_body__(self, comment_tags):
