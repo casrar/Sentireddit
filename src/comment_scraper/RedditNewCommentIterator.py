@@ -65,8 +65,8 @@ class RedditNewCommentIterator:
         for comment in comments:
             post_info = comment.attrs
             comment_info = json.loads(post_info['data-faceplate-tracking-context'])
-            post_id = comment_info['post_id']
             comment_info = comment_info['comment']
+            post_id = comment_info['post_id']
             comment_id = comment_info['id']
             created_timestamp = comment_info['created_timestamp']
             comment_body = comment.find_all(id=f'search-comment-{comment_id}-post-rtjson-content')
