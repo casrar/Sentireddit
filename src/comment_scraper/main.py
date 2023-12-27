@@ -25,7 +25,6 @@ def auth_to_db(config):
     auth_token = response['token']
     return auth_token
 
-
 def get_data_sources(auth_token):
     # error check and log
     response = requests.get(
@@ -41,9 +40,9 @@ def get_data_sources(auth_token):
     return data_sources
 
 def scrape_comments(data_source, auth_token, config):
-    comments = RedditNewCommentIterator(subreddit=data_source[SUBREDDIT], query=data_source[QUERY],
+    pages = RedditNewCommentIterator(subreddit=data_source[SUBREDDIT], query=data_source[QUERY],
                                 proxy_url='https://proxy.scrapeops.io/v1/', api_key=config['SCRAPE_OPS_KEY'])
-    recent_timestamp = -1
+    recent_timestamp = -1 
     recent_comment_id = -1
     params = {'sort':'-created_timestamp', 'filter': f'(data_source=\'{data_source[DATA_SOURCE_ID]}\')'}
     response = requests.get(
@@ -53,22 +52,19 @@ def scrape_comments(data_source, auth_token, config):
         recent_timestamp = response['items'][0]['created_timestamp']
         recent_comment_id = response['items'][0]['comment_id']
     data = []
-    for comment in comments:
-        comment = comment[0] # unpacking from len(1) list
-        curr_timestamp = comment[COMMENT_CREATED_TIMESTAMP]
-        curr_comment_id = comment[COMMENT_ID]
-        if curr_timestamp <= recent_timestamp or curr_comment_id == recent_comment_id: 
-            break
-        comment = {
-            'body': comment[COMMENT_BODY],
-            'post_id': comment[COMMENT_POST_ID],
-            'comment_id': comment[COMMENT_ID],
-            'created_timestamp': recent_timestamp,
-            'data_source': data_source[DATA_SOURCE_ID],
-        }
-        data.append(comment)
+    for page in pages:
+        for comment in page:
+            if comment[COMMENT_CREATED_TIMESTAMP] <= recent_timestamp or comment[COMMENT_ID] == recent_comment_id: 
+                break
+            comment = {
+                'body': comment[COMMENT_BODY],
+                'post_id': comment[COMMENT_POST_ID],
+                'comment_id': comment[COMMENT_ID],
+                'created_timestamp': comment[COMMENT_CREATED_TIMESTAMP],
+                'data_source': data_source[DATA_SOURCE_ID],
+            }
+            data.append(comment)
     return data
-
 
 def analyze_comments(comments, sentiment_intensity_analyzer):
     for comment in comments:
