@@ -19,31 +19,18 @@ class RedditNewCommentIterator:
         }
     
     def __scrape(self): 
-        ## test version
         try:
-            response = requests.get(url=self.__reddit_origin_url + self.__reddit_partial_url)
+            response = requests.get(
+                url=self.__proxy_url,
+                params=urlencode(self.__proxy_params),
+            )
             response.raise_for_status()
             response = response.text
             return response
         except requests.exceptions.HTTPError as err:
             # handle out of credits 
             # replace with log
-            return err
-        
-
-        ## live version 
-        # response = requests.get(
-        #     url=self.__proxy_url,
-        #     params=urlencode(self.__proxy_params),
-        # )
-        # try:
-        #     response.raise_for_status()
-        #     response = response.text
-        #     return response
-        # except requests.exceptions.HTTPError as err:
-        #     # handle out of credits 
-        #     # replace with log
-        #     print('error')
+            print('error')
 
     def __iter__(self):
         return self
