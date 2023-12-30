@@ -7,7 +7,7 @@ A self hostable full stack app to provide sentiment analysis Reddit data.
 
 
 # Setup
-- Navigate to Sentiment-Stocks directory
+- Navigate to project directory
 - Run database 
   - ```database/pocketbase serve```
 - Create account for database
