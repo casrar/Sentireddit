@@ -12,7 +12,7 @@ A self hostable full stack app to provide sentiment analysis Reddit data.
   - ```database/pocketbase serve```
 - Create account for database
 - Configure ```.env``` file in ```src/``` directory
-![image](https://github.com/casrar/Sentireddit/assets/79720481/51fb8aa2-8d86-4247-8f51-a83b98a298c9)
+  - ![image](https://github.com/casrar/Sentireddit/assets/79720481/51fb8aa2-8d86-4247-8f51-a83b98a298c9)
 - Run server 
   - ```cd src```
   - Run ```pipenv run flask --app sentireddit.py run``` (or add ```--debug``` after ```sentireddit.py run```)
