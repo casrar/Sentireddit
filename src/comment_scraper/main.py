@@ -1,9 +1,6 @@
 import requests 
-import urllib.parse
 import logging 
-import praw
 import json
-import time
 from nltk.sentiment import SentimentIntensityAnalyzer
 from dotenv import dotenv_values
 from RedditNewCommentIterator import RedditNewCommentIterator
