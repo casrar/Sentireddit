@@ -13,6 +13,7 @@ pandas = "*"
 flask = "*"
 flask-htmx = "*"
 jinja-partials = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 
