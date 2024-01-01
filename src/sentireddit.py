@@ -46,7 +46,7 @@ def add_data_source():
     context = {}
     data = {
         'subreddit': request.form['subreddit'],
-        'search_term': request.form['search-term']
+        'query': request.form['query']
     }
     response = requests.post('http://127.0.0.1:8090/api/collections/data_source/records',
                                 json=data).json()     
