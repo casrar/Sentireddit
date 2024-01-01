@@ -1,5 +1,6 @@
 from statistics import mean 
-import requests 
+import requests
+from urllib.parse import urlencode
 import datetime
 from datetime import date, datetime as dt
 
@@ -87,9 +88,9 @@ def sentiment_observation(avg_compound): # error with overwhelmingly negative, c
     else:
         return 'overwhelmingly negative'
 
-def ordered_form_date_to_unix(first_date, second_date):
-    first_date = int (dt.strptime(first_date, '%Y-%m-%d').timestamp())
-    second_date = int (dt.strptime(second_date, '%Y-%m-%d').timestamp())
+def ordered_form_date_to_unix(first_date, second_date): 
+    first_date = int (dt.strptime(first_date, '%Y-%m-%d').timestamp()) * 1000
+    second_date = int (dt.strptime(second_date, '%Y-%m-%d').timestamp()) * 1000
 
     if second_date < first_date:
         return (second_date, first_date)
@@ -103,7 +104,7 @@ def get_most_negative_data_record(first_date, second_date, data_source, auth_tok
         'filter': f'(data_source=\'{data_source}\' && created_timestamp >= {dates[0]} && created_timestamp <= {dates[1]})'
     }
     response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
-                            params=params,
+                            params=urlencode(params),
                             headers={'Authorization': auth_token}).json() 
     items = response['items']
     return items[0]['body'] if items else 'N/A'
@@ -116,7 +117,7 @@ def get_most_positive_data_record(first_date, second_date, data_source, auth_tok
         'filter': f'(data_source=\'{data_source}\' && created_timestamp >= {dates[0]} && created_timestamp <= {dates[1]})'
     }
     response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
-                            params=params,
+                            params=urlencode(params),
                             headers={'Authorization': auth_token}).json() 
     items = response['items']
     return items[0]['body'] if items else 'N/A'
@@ -136,7 +137,7 @@ def get_all_data(auth_token):
         return None
     params = { 'perPage': per_page }
     response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
-                            params=params,
+                            params=urlencode(params),
                             headers={'Authorization': auth_token}).json() 
     return response
 
@@ -155,11 +156,14 @@ def get_all_data_in_date_range(first_date, second_date, data_source, auth_token)
     if per_page < 1:
         return None
     dates = ordered_form_date_to_unix(first_date=first_date, second_date=second_date)
+    print(per_page, dates)
     params = {
             'per_page': per_page,
             'filter': f'(data_source=\'{data_source}\' && created_timestamp >= {dates[0]} && created_timestamp <= {dates[1]})'
         }
+    print(params)
     response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
-                            params=params,
+                            params=urlencode(params),
                             headers={'Authorization': auth_token}).json() 
+    print(response)
     return response
