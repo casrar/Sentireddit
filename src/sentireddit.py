@@ -8,6 +8,7 @@ from flask_htmx import HTMX
 import jinja_partials
 import utils
 
+
 config = dotenv_values(".env")
 # error check and log
 try:

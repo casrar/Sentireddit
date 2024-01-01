@@ -156,14 +156,11 @@ def get_all_data_in_date_range(first_date, second_date, data_source, auth_token)
     if per_page < 1:
         return None
     dates = ordered_form_date_to_unix(first_date=first_date, second_date=second_date)
-    print(per_page, dates)
     params = {
             'per_page': per_page,
             'filter': f'(data_source=\'{data_source}\' && created_timestamp >= {dates[0]} && created_timestamp <= {dates[1]})'
         }
-    print(params)
     response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
                             params=urlencode(params),
                             headers={'Authorization': auth_token}).json() 
-    print(response)
     return response
