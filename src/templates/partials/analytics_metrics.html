@@ -37,41 +37,25 @@
                 <div class="border border-solid bg-purple-100 border-black border-2 rounded-lg flex flex-col items-center px-8 h-20">
                     <h3 class="text-2xl text-purple-400">Compound</h3>
                     <div class="h-full flex flex-col justify-center ">
-                        {% if context['avg_compound'] %}
-                            <p>{{ context['avg_compound'] }}</p>
-                        {% else %}
-                            <p>N/A</p>
-                        {% endif %}
+                        <p>{{ context['avg_compound'] }}</p>
                     </div>
                 </div>
                 <div class="border border-solid bg-green-100 border-black border-2 rounded-lg flex flex-col items-center">
                     <h3 class="text-2xl text-green-400">Positive</h3>
                     <div class="h-full flex flex-col justify-center">
-                        {% if context['avg_pos'] %}
-                            <p>{{ context['avg_pos'] }}</p>
-                        {% else %}
-                            <p>N/A</p>
-                        {% endif %}
+                        <p>{{ context['avg_pos'] }}</p>           
                     </div>
                 </div>
                 <div class="border border-solid bg-slate-100 border-black border-2 rounded-lg flex flex-col items-center">
                     <h3 class="text-2xl text-slate-400">Neutral</h3>
                     <div class="h-full flex flex-col justify-center">
-                        {% if context['avg_neu'] %}
-                            <p>{{ context['avg_neu'] }}</p>
-                        {% else %}
-                            <p>N/A</p>
-                        {% endif %}
+                        <p>{{ context['avg_neu'] }}</p>
                     </div>
                 </div>
                 <div class="border border-solid bg-red-100 border-black border-2 rounded-lg flex flex-col items-center">
                     <h3 class="text-2xl ">Negative</h3>
                     <div class="h-full flex flex-col justify-center">
-                        {% if context['avg_neg'] %}
-                            <p>{{ context['avg_neg'] }}</p>
-                        {% else %}
-                            <p>N/A</p>
-                        {% endif %}
+                        <p>{{ context['avg_neg'] }}</p>
                     </div>
                 </div>
             </div>
