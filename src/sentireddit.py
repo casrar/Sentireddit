@@ -114,6 +114,8 @@ def update_data_source():
         return render_template('partials/chart.html', context=context, chart_data=chart_data)
     
     items = utils.get_all_data_in_date_range(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)['items']
+    if not items: # Return nothing if no data exists
+        return render_template('partials/analytics_metrics.html', context=context, chart_data=chart_data)
     context['avg_compound'], context['avg_pos'], context['avg_neu'], context['avg_neg'] = utils.calculate_average_sentiments(items)
     context['avg_compound'] = round(context['avg_compound'], 2)
     context['avg_pos'] = round(context['avg_pos'], 2)
