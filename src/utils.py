@@ -164,3 +164,16 @@ def get_all_data_in_date_range(first_date, second_date, data_source, auth_token)
                             params=urlencode(params),
                             headers={'Authorization': auth_token}).json() 
     return response
+
+def get_all_data_from_data_source(data_source, auth_token):
+    per_page = get_total_records('http://127.0.0.1:8090/api/collections/data/records', auth_token=auth_token)
+    if per_page < 1:
+        return None
+    params = {
+            'per_page': per_page,
+            'filter': f'(data_source=\'{data_source}\')'
+        }
+    response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
+                            params=urlencode(params),
+                            headers={'Authorization': auth_token}).json() 
+    return response

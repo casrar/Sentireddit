@@ -57,6 +57,13 @@ def add_data_source():
 def remove_data_source():
     context = {}
     selected_data = request.form.getlist('selected-data')
+    data = []
+    for id in selected_data:
+        data += utils.get_all_data_from_data_source(data_source=id, auth_token=auth_token)['items']
+    for item in data: 
+        id = item['id']
+        response = requests.delete(f'http://127.0.0.1:8090/api/collections/data/records/{id}')
+
     for id in selected_data:
         response = requests.delete(f'http://127.0.0.1:8090/api/collections/data_source/records/{id}')
     context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
