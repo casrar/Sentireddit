@@ -67,8 +67,8 @@ def remove_data_source():
     for id in selected_data:
         response = requests.delete(f'http://127.0.0.1:8090/api/collections/data_source/records/{id}')
     context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
-
-    return render_template('/partials/data_sources.html', context=context)
+    context['data'] = utils.get_all_data(auth_token)['items']
+    return render_template('/partials/data_sources_and_data.html', context=context)
 
 @app.route('/remove_data', methods=['DELETE'])
 def remove_data():
