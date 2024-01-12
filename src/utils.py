@@ -133,7 +133,7 @@ def get_total_records(url, auth_token):
 
 def get_all_data(auth_token):
     per_page = get_total_records('http://127.0.0.1:8090/api/collections/data/records', auth_token=auth_token)
-    if per_page < 1:
+    if per_page and per_page < 1:
         return None
     params = { 'perPage': per_page }
     response = requests.get('http://127.0.0.1:8090/api/collections/data/records',
@@ -143,7 +143,7 @@ def get_all_data(auth_token):
 
 def get_all_data_sources(auth_token):
     per_page = get_total_records('http://127.0.0.1:8090/api/collections/data_source/records', auth_token=auth_token)
-    if per_page < 1:
+    if per_page and per_page < 1:
         return None
     params = { 'perPage': per_page }
     response = requests.get('http://127.0.0.1:8090/api/collections/data_source/records',
@@ -153,7 +153,7 @@ def get_all_data_sources(auth_token):
 
 def get_all_data_in_date_range(first_date, second_date, data_source, auth_token):
     per_page = get_total_records('http://127.0.0.1:8090/api/collections/data/records', auth_token=auth_token)
-    if per_page < 1:
+    if per_page and per_page < 1:
         return None
     dates = ordered_form_date_to_unix(first_date=first_date, second_date=second_date)
     params = {
@@ -167,7 +167,7 @@ def get_all_data_in_date_range(first_date, second_date, data_source, auth_token)
 
 def get_all_data_from_data_source(data_source, auth_token):
     per_page = get_total_records('http://127.0.0.1:8090/api/collections/data/records', auth_token=auth_token)
-    if per_page < 1:
+    if per_page and per_page < 1:
         return None
     params = {
             'per_page': per_page,
