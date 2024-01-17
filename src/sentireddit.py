@@ -40,7 +40,10 @@ def data_management():
         context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
         context['data'] = utils.get_all_data(auth_token)['items']
     except:
-        context = {}
+        if 'data_sources' not in context:
+            context['data_sources'] = {}
+        if 'data' not in context:
+            context['data'] = {}
 
     return render_template('data_management.html', context=context)
 
@@ -69,8 +72,14 @@ def remove_data_source():
 
     for id in selected_data:
         response = requests.delete(f'http://127.0.0.1:8090/api/collections/data_source/records/{id}')
-    context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
-    context['data'] = utils.get_all_data(auth_token)['items']
+    try:
+        context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
+        context['data'] = utils.get_all_data(auth_token)['items']
+    except:
+        if 'data_sources' not in context:
+            context['data_sources'] = {}
+        if 'data' not in context:
+            context['data'] = {}
     return render_template('/partials/data_sources_and_data.html', context=context)
 
 @app.route('/remove_data', methods=['DELETE'])
