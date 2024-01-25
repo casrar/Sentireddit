@@ -2,8 +2,8 @@
 A self hostable full stack app to provide sentiment analysis Reddit data.
 
 ![image](https://github.com/casrar/Sentireddit/assets/79720481/4b9bc67c-e9c3-4ea7-9dd3-b6df310182af)
-![image](https://github.com/casrar/Sentireddit/assets/79720481/76a4bc9c-7073-4e66-b589-9112162620e9)
-![image](https://github.com/casrar/Sentireddit/assets/79720481/078b1e3f-00ae-4463-bb9b-14c4a27f131a)
+![image](https://github.com/casrar/Sentireddit/assets/79720481/f6778ff3-c72c-4af5-83a3-b6c3ce0864f2)
+![image](https://github.com/casrar/Sentireddit/assets/79720481/39f01f78-e787-4b3b-a6de-f14b14a6b6bb)
 
 
 # Setup
