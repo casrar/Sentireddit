@@ -129,7 +129,7 @@
                     <option value="" selected disabled hidden>Select Data Source....</option>
                     {% for item in context['data_sources'] %} 
                         <option value="{{ item['id'] }}" required>
-                            r/{{ item['subreddit']}} : {{ item['search_term'] }} 
+                            r/{{ item['subreddit']}} : {{ item['query'] }} 
                         </option>
                     {% endfor %}
                 </select>  

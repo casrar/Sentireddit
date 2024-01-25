@@ -8,6 +8,7 @@ from flask_htmx import HTMX
 import jinja_partials
 import utils
 
+
 config = dotenv_values(".env")
 # error check and log
 try:
@@ -35,8 +36,14 @@ def about():
 @app.route('/data_management', methods=['POST', 'GET'])
 def data_management():
     context = {}
-    context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
-    context['data'] = utils.get_all_data(auth_token)['items']
+    try:
+        context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
+        context['data'] = utils.get_all_data(auth_token)['items']
+    except:
+        if 'data_sources' not in context:
+            context['data_sources'] = {}
+        if 'data' not in context:
+            context['data'] = {}
 
     return render_template('data_management.html', context=context)
 
@@ -45,7 +52,7 @@ def add_data_source():
     context = {}
     data = {
         'subreddit': request.form['subreddit'],
-        'search_term': request.form['search-term']
+        'query': request.form['query']
     }
     response = requests.post('http://127.0.0.1:8090/api/collections/data_source/records',
                                 json=data).json()     
@@ -56,11 +63,24 @@ def add_data_source():
 def remove_data_source():
     context = {}
     selected_data = request.form.getlist('selected-data')
+    data = []
+    for id in selected_data:
+        data += utils.get_all_data_from_data_source(data_source=id, auth_token=auth_token)['items']
+    for item in data: 
+        id = item['id']
+        response = requests.delete(f'http://127.0.0.1:8090/api/collections/data/records/{id}')
+
     for id in selected_data:
         response = requests.delete(f'http://127.0.0.1:8090/api/collections/data_source/records/{id}')
-    context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
-
-    return render_template('/partials/data_sources.html', context=context)
+    try:
+        context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
+        context['data'] = utils.get_all_data(auth_token)['items']
+    except:
+        if 'data_sources' not in context:
+            context['data_sources'] = {}
+        if 'data' not in context:
+            context['data'] = {}
+    return render_template('/partials/data_sources_and_data.html', context=context)
 
 @app.route('/remove_data', methods=['DELETE'])
 def remove_data():
@@ -113,6 +133,8 @@ def update_data_source():
         return render_template('partials/chart.html', context=context, chart_data=chart_data)
     
     items = utils.get_all_data_in_date_range(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)['items']
+    if not items: # Return nothing if no data exists
+        return render_template('partials/analytics_metrics.html', context=context, chart_data=chart_data)
     context['avg_compound'], context['avg_pos'], context['avg_neu'], context['avg_neg'] = utils.calculate_average_sentiments(items)
     context['avg_compound'] = round(context['avg_compound'], 2)
     context['avg_pos'] = round(context['avg_pos'], 2)
