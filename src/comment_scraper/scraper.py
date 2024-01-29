@@ -3,7 +3,7 @@ import logging
 import json
 from nltk.sentiment import SentimentIntensityAnalyzer
 from dotenv import dotenv_values
-from RedditNewCommentIterator import RedditNewCommentIterator
+from .RedditNewCommentIterator import RedditNewCommentIterator
 
 # CONSTS
 SUBREDDIT = 0
@@ -77,7 +77,7 @@ def post_comments_to_db(comments, auth_token):
         response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=comment, headers={'Authorization': auth_token}).json()
 
 def main():
-    config = dotenv_values("../.env")
+    config = dotenv_values(".env")
     sia = SentimentIntensityAnalyzer()
     auth_token = auth_to_db(config)
     data_sources = get_data_sources(auth_token)
