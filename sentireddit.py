@@ -6,7 +6,7 @@ import plotly.express as px
 import pandas as pd
 from flask_htmx import HTMX
 import jinja_partials
-import utils
+import utils.utils as utils
 
 
 config = dotenv_values(".env")
