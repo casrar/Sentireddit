@@ -4,16 +4,15 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-requests = "*"
-python-dotenv = "*"
-praw = "*"
-nltk = "*"
+requests = "==2.*"
+python-dotenv = "1.0.1"
+nltk = "==3.*"
 plotly = "*"
 pandas = "*"
-flask = "*"
+flask = "==3.*"
 flask-htmx = "*"
 jinja-partials = "*"
-beautifulsoup4 = "*"
+beautifulsoup4 = "==4.*"
 
 [dev-packages]
 

@@ -1,9 +1,8 @@
 import requests 
 import logging 
-import json
 from nltk.sentiment import SentimentIntensityAnalyzer
 from dotenv import dotenv_values
-from .RedditNewCommentIterator import RedditNewCommentIterator
+from scraper import RedditNewCommentIterator
 
 # CONSTS
 SUBREDDIT = 0
@@ -13,28 +12,6 @@ COMMENT_BODY = 0
 COMMENT_POST_ID = 1
 COMMENT_ID = 2
 COMMENT_CREATED_TIMESTAMP = 3
-
-def auth_to_db(config):
-    # error check and log
-    response = requests.post(
-        'http://127.0.0.1:8090/api/collections/users/auth-with-password', 
-        data={'identity': config['IDENTITY'], 'password': config['PASSWORD']}).json()
-    auth_token = response['token']
-    return auth_token
-
-def get_data_sources(auth_token):
-    # error check and log
-    response = requests.get(
-        'http://127.0.0.1:8090/api/collections/data_source/records', 
-        headers={'Authorization': auth_token}).json()
-
-    data_sources = []
-    for i in range(response['totalItems']):
-        data_sources.append(
-            (response['items'][i]['subreddit'], 
-            response['items'][i]['query'],
-            response['items'][i]['id'])) 
-    return data_sources
 
 def scrape_comments(data_source, auth_token, config):
     pages = RedditNewCommentIterator(subreddit=data_source[SUBREDDIT], query=data_source[QUERY],
@@ -76,7 +53,7 @@ def post_comments_to_db(comments, auth_token):
     for comment in comments:
         response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=comment, headers={'Authorization': auth_token}).json()
 
-def main():
+def scrape():
     config = dotenv_values(".env")
     sia = SentimentIntensityAnalyzer()
     auth_token = auth_to_db(config)
@@ -87,4 +64,4 @@ def main():
         post_comments_to_db(comments=comments, auth_token=auth_token)
 
 if __name__ == "__main__":
-    main()
+    scrape()
