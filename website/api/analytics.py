@@ -1,3 +1,7 @@
+from flask import Blueprint
+
+bp = Blueprint("analytics", __name__)
+
 @app.route('/update_graph', methods=['POST'])
 def update_graph():
     context = {}

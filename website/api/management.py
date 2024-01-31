@@ -1,3 +1,7 @@
+from flask import Blueprint
+
+bp = Blueprint("management", __name__)
+
 @app.route('/data_management', methods=['POST', 'GET'])
 def data_management():
     context = {}
