@@ -6,7 +6,7 @@ import plotly.express as px
 import pandas as pd
 from flask_htmx import HTMX
 import jinja_partials
-import utils.utils as utils
+import utils.analytics as analytics
 
 
 config = dotenv_values(".env")
@@ -37,8 +37,8 @@ def about():
 def data_management():
     context = {}
     try:
-        context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
-        context['data'] = utils.get_all_data(auth_token)['items']
+        context['data_sources'] = analytics.get_all_data_sources(auth_token)['items']
+        context['data'] = analytics.get_all_data(auth_token)['items']
     except:
         if 'data_sources' not in context:
             context['data_sources'] = {}
@@ -56,7 +56,7 @@ def add_data_source():
     }
     response = requests.post('http://127.0.0.1:8090/api/collections/data_source/records',
                                 json=data).json()     
-    context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
+    context['data_sources'] = analytics.get_all_data_sources(auth_token)['items']
     return render_template('/partials/data_sources.html', context=context)
 
 @app.route('/remove_data_source', methods=['DELETE'])
@@ -65,7 +65,7 @@ def remove_data_source():
     selected_data = request.form.getlist('selected-data')
     data = []
     for id in selected_data:
-        data += utils.get_all_data_from_data_source(data_source=id, auth_token=auth_token)['items']
+        data += analytics.get_all_data_from_data_source(data_source=id, auth_token=auth_token)['items']
     for item in data: 
         id = item['id']
         response = requests.delete(f'http://127.0.0.1:8090/api/collections/data/records/{id}')
@@ -73,8 +73,8 @@ def remove_data_source():
     for id in selected_data:
         response = requests.delete(f'http://127.0.0.1:8090/api/collections/data_source/records/{id}')
     try:
-        context['data_sources'] = utils.get_all_data_sources(auth_token)['items']
-        context['data'] = utils.get_all_data(auth_token)['items']
+        context['data_sources'] = analytics.get_all_data_sources(auth_token)['items']
+        context['data'] = analytics.get_all_data(auth_token)['items']
     except:
         if 'data_sources' not in context:
             context['data_sources'] = {}
@@ -88,7 +88,7 @@ def remove_data():
     selected_data = request.form.getlist('selected-data')
     for id in selected_data:
         response = requests.delete(f'http://127.0.0.1:8090/api/collections/data/records/{id}')
-    context['data'] = utils.get_all_data(auth_token)['items']
+    context['data'] = analytics.get_all_data(auth_token)['items']
         
     return render_template('/partials/data.html', context=context)
 
@@ -107,12 +107,12 @@ def update_graph():
     context = {}
     chart_data = None
 
-    validated_form = utils.validate_analytics_form(request) 
+    validated_form = analytics.validate_analytics_form(request) 
     if validated_form is None:
         return render_template('partials/chart.html', context=context, chart_data=chart_data)
     chart_type, data_source, first_date, second_date = validated_form
     
-    chart_data = utils.generate_chart(chart_type=chart_type, first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)
+    chart_data = analytics.generate_chart(chart_type=chart_type, first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)
     if chart_data is None:
         return render_template('partials/chart.html', context=context, chart_data=chart_data)
 
@@ -123,24 +123,24 @@ def update_data_source():
     context = {}
     chart_data = None
     
-    validated_form = utils.validate_analytics_form(request) 
+    validated_form = analytics.validate_analytics_form(request) 
     if validated_form is None:
         return render_template('partials/analytics_metrics.html', context=context, chart_data=chart_data)
     chart_type, data_source, first_date, second_date = validated_form
 
-    chart_data = utils.generate_chart(chart_type=chart_type, first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)
+    chart_data = analytics.generate_chart(chart_type=chart_type, first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)
     if chart_data is None:
         return render_template('partials/chart.html', context=context, chart_data=chart_data)
     
-    items = utils.get_all_data_in_date_range(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)['items']
+    items = analytics.get_all_data_in_date_range(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)['items']
     if not items: # Return nothing if no data exists
         return render_template('partials/analytics_metrics.html', context=context, chart_data=chart_data)
-    context['avg_compound'], context['avg_pos'], context['avg_neu'], context['avg_neg'] = utils.calculate_average_sentiments(items)
+    context['avg_compound'], context['avg_pos'], context['avg_neu'], context['avg_neg'] = analytics.calculate_average_sentiments(items)
     context['avg_compound'] = round(context['avg_compound'], 2)
     context['avg_pos'] = round(context['avg_pos'], 2)
     context['avg_neu'] = round(context['avg_neu'], 2) 
     context['avg_neg'] = round(context['avg_neg'], 2) 
-    context['summary'] = utils.sentiment_observation(context['avg_compound'])
-    context['most_positive_post'] = utils.get_most_positive_data_record(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)
-    context['most_negative_post'] = utils.get_most_negative_data_record(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)
+    context['summary'] = analytics.sentiment_observation(context['avg_compound'])
+    context['most_positive_post'] = analytics.get_most_positive_data_record(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)
+    context['most_negative_post'] = analytics.get_most_negative_data_record(first_date=first_date, second_date=second_date, data_source=data_source, auth_token=auth_token)
     return render_template('partials/analytics_metrics.html', context=context, chart_data=chart_data)

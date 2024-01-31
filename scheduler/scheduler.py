@@ -1,5 +1,5 @@
 import sched, time, logging, requests, multiprocessing
-from . import scraper
+from ..scraper.api import scraper
 from dotenv import dotenv_values
 
 config = dotenv_values(".env")
