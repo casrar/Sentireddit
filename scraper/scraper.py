@@ -4,6 +4,8 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 from dotenv import dotenv_values
 from scraper import RedditNewCommentIterator
 
+from scraper.database import Database
+
 # CONSTS
 SUBREDDIT = 0
 QUERY = 1
@@ -54,10 +56,11 @@ def post_comments_to_db(comments, auth_token):
         response = requests.post('http://127.0.0.1:8090/api/collections/data/records', json=comment, headers={'Authorization': auth_token}).json()
 
 def scrape():
+    print('Scraping')
     config = dotenv_values(".env")
     sia = SentimentIntensityAnalyzer()
-    auth_token = auth_to_db(config)
-    data_sources = get_data_sources(auth_token)
+    auth_token = Database.auth_to_db(config)
+    data_sources = Database.get_data_sources(auth_token)
     for data_source in data_sources:
         comments = scrape_comments(data_source=data_source, auth_token=auth_token, config=config)
         comments = analyze_comments(comments=comments, sentiment_intensity_analyzer=sia)
