@@ -1,8 +1,8 @@
 import sched, time, logging, requests, multiprocessing
-from ..scraper import scraper
 from dotenv import dotenv_values
 
-config = dotenv_values(".env")
+config = dotenv_values("../.env")
+
 scheduler = sched.scheduler(time.monotonic, time.sleep)
 
 def auth_to_db(config):
@@ -26,12 +26,13 @@ def get_current_delay(auth_token):
     return current_delay
 
 def run_scraper():
-    scraper.main()
+    # send request to scrape endpoint
+    requests.get('http://127.0.0.1:5000/scrape')
 
 auth_token = auth_to_db(config)
-# while True: # not functioning
-#     delay = get_current_delay(auth_token)
-#     if delay is None:
-#         continue
-#     scheduler.enter(delay, 0, run_scraper, ())
-#     scheduler.run()
+while True: # not functioning
+    delay = get_current_delay(auth_token)
+    if delay is None:
+        continue
+    scheduler.enter(delay, 0, run_scraper, ())
+    scheduler.run()
