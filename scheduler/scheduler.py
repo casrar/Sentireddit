@@ -4,7 +4,7 @@ from utils import database
 def scrape() -> None:
     requests.get('')
 
-def main():
+def main() -> None:
     scheduler = sched.scheduler(time.monotonic, time.sleep)
     while True:
         delay = get_current_delay(auth_token)
