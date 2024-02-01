@@ -1,7 +1,6 @@
-import requests
+import requests, logging, json
 from urllib.parse import urlencode
 from bs4 import BeautifulSoup
-import json
 
 
 class RedditNewCommentIterator:
@@ -18,7 +17,7 @@ class RedditNewCommentIterator:
             'url': self.__reddit_origin_url + self.__reddit_partial_url
         }
     
-    def __scrape(self): 
+    def __scrape__(self): 
         try:
             response = requests.get(
                 url=self.__proxy_url,
@@ -28,9 +27,7 @@ class RedditNewCommentIterator:
             response = response.text
             return response
         except requests.exceptions.HTTPError as err:
-            # handle out of credits 
-            # replace with log
-            print('error')
+            logging.warning('Error in \'__scrape__\'')
 
     def __iter__(self):
         return self
@@ -39,11 +36,13 @@ class RedditNewCommentIterator:
         if self.__last_iteration:
             raise StopIteration
         self.__proxy_params['url'] = self.__reddit_origin_url + self.__reddit_partial_url
-        page = self.__scrape()
-        # check for errors
-        soup = BeautifulSoup(page, 'html.parser')
-        comments = self.__format_comments__(soup)
-        self.__reddit_partial_url = self.__get_next_reddit_partial_url__(soup)
+        page = self.__scrape__()
+        try:
+            soup = BeautifulSoup(page, 'html.parser')
+            comments = self.__format_comments__(soup)
+            self.__reddit_partial_url = self.__get_next_reddit_partial_url__(soup)
+        except:
+            logging.warning('Error in \'__next__\'')
         return comments
        
     def __format_comments__(self, soup):
