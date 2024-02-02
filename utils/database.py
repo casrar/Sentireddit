@@ -1,33 +1,11 @@
 from typing import List, Optional
+import requests, logging
 
-class Database:
-    def auth_to_db(config) -> str: 
-        pass
-
-    # def get_data_sources(auth_token) -> List[str]: 
-    #     pass
-
-    # def get_most_negative_data_record(auth_token) -> Optional[List[str]]: 
-    #     pass
-
-    # def get_most_positive_data_record(auth_token) -> Optional[List[str]]: 
-    #     pass
-
-    # def get_total_records(url, auth_token) -> Optional[List[str]]: 
-    #     pass
-
-    # def get_all_data(auth_token) -> Optional[List[str]]: 
-    #     pass
-
-    # def get_all_data_sources(auth_token) -> Optional[List[str]]: 
-    #     pass
-
-    # def get_all_data_in_date_range(auth_token) -> Optional[List[str]]: 
-    #     pass
-
-    # def get_all_data_from_data_source(auth_token) -> Optional[List[str]]: 
-    #     pass
-
-    def get_current_delay(auth_token) -> int: 
-        return auth_token #
-        
+def auth_with_password(self, url: str, identity: str, password: str) -> Optional[str]: 
+    try:
+        response = requests.post(url=f'{url}/api/collections/users/auth-with-password',
+                                data={'identity': identity, 'password': password}).json()
+    except:
+        logging.warning('Failed to authenticate, 400')
+        return None
+    return response['token']
