@@ -28,5 +28,6 @@ class Database:
     # def get_all_data_from_data_source(auth_token) -> Optional[List[str]]: 
     #     pass
 
-    # def get_current_delay(auth_token) -> int: 
-    #     pass
+    def get_current_delay(auth_token) -> int: 
+        return auth_token #
+        
