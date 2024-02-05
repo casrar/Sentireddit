@@ -3,7 +3,7 @@ migrate((db) => {
     {
       "id": "9lgohp90l2nt12k",
       "created": "2023-05-20 03:27:52.037Z",
-      "updated": "2024-02-02 20:07:26.417Z",
+      "updated": "2024-02-04 20:58:33.545Z",
       "name": "data",
       "type": "base",
       "system": false,
@@ -124,17 +124,17 @@ migrate((db) => {
         }
       ],
       "indexes": [],
-      "listRule": "",
-      "viewRule": "",
-      "createRule": "",
-      "updateRule": "",
-      "deleteRule": "",
+      "listRule": null,
+      "viewRule": null,
+      "createRule": null,
+      "updateRule": null,
+      "deleteRule": null,
       "options": {}
     },
     {
       "id": "js50r8yv2u12b4n",
       "created": "2023-05-20 19:46:33.858Z",
-      "updated": "2024-02-02 20:07:34.806Z",
+      "updated": "2024-02-04 20:58:11.049Z",
       "name": "data_source",
       "type": "base",
       "system": false,
@@ -167,17 +167,17 @@ migrate((db) => {
         }
       ],
       "indexes": [],
-      "listRule": "",
-      "viewRule": "",
-      "createRule": "",
-      "updateRule": "",
-      "deleteRule": "",
+      "listRule": null,
+      "viewRule": null,
+      "createRule": null,
+      "updateRule": null,
+      "deleteRule": null,
       "options": {}
     },
     {
       "id": "_pb_users_auth_",
       "created": "2023-08-22 21:43:47.903Z",
-      "updated": "2023-08-22 21:43:47.905Z",
+      "updated": "2024-02-04 20:58:51.561Z",
       "name": "users",
       "type": "auth",
       "system": false,
@@ -218,11 +218,11 @@ migrate((db) => {
         }
       ],
       "indexes": [],
-      "listRule": "id = @request.auth.id",
-      "viewRule": "id = @request.auth.id",
-      "createRule": "",
-      "updateRule": "id = @request.auth.id",
-      "deleteRule": "id = @request.auth.id",
+      "listRule": null,
+      "viewRule": null,
+      "createRule": null,
+      "updateRule": null,
+      "deleteRule": null,
       "options": {
         "allowEmailAuth": true,
         "allowOAuth2Auth": true,
@@ -237,7 +237,7 @@ migrate((db) => {
     {
       "id": "ktatp8abyt8ji5o",
       "created": "2024-02-02 19:30:31.202Z",
-      "updated": "2024-02-02 20:07:42.520Z",
+      "updated": "2024-02-04 20:58:24.585Z",
       "name": "scraper_delay",
       "type": "base",
       "system": false,
@@ -256,11 +256,11 @@ migrate((db) => {
         }
       ],
       "indexes": [],
-      "listRule": "",
-      "viewRule": "",
-      "createRule": "",
-      "updateRule": "",
-      "deleteRule": "",
+      "listRule": null,
+      "viewRule": null,
+      "createRule": null,
+      "updateRule": null,
+      "deleteRule": null,
       "options": {}
     }
   ];
