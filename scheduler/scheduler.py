@@ -1,23 +1,29 @@
-import requests, sched, time, logging
-from utils.database import auth_with_password
+import requests, sched, time, os
+from utils.database.database import auth_with_password
+from utils.logger.logger import get_logger
+
+logger = get_logger()
 
 def scrape() -> None:
-    requests.get('127.0.0.1:5000/scrape') # should be set as an env variable
+    try:
+        requests.post(os.getenv('SCRAPER_URL') + '/scrape')
+    except Exception as e:
+        logger.critical(f'Error with scrape(): {e}')
 
 def get_current_delay() -> int:
-    auth_token = auth_with_password() # params come from env variable
-    if auth_token == None:
+    auth_token = auth_with_password(os.getenv('DB_URL'), os.getenv('DB_IDENTITY'), os.getenv('DB_PASSWORD'))
+    if auth_token is None:
         return auth_token
     try:
-        response = requests.get(url=f'{env}/api/collections/scraper_delay_records', #replace with env
+        response = requests.get(url=os.getenv('DB_URL') + '/api/collections/scraper_delay/records', 
                                 headers={'Authorization': auth_token}).json()
-    except:
-        logging.warning('Error with request, 400')
+        if response.get('totalItems') is None:
+            return None
+        response = response['items'][0]['scraper_delay']
+    except Exception as e:
+        logger.warning(f'Error with get_current_delay(): {e}')
         return None
-    if not response['totalItems'] > 0:
-        return None
-
-    return response['items'][0]['scraper_delay']
+    return response
 
 def main() -> None:
     scheduler = sched.scheduler(time.monotonic, time.sleep)
