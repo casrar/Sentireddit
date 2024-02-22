@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 def logger_config() -> None:
     try:
-        config = pathlib.Path('config.json')
+        config = pathlib.Path('utils/logger/config.json')
         with open(config) as f:
             config = json.load(f)
         logging.config.dictConfig(config=config)
