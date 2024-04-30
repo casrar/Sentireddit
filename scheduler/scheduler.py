@@ -1,4 +1,5 @@
 import requests, sched, time, os
+from typing import Optional
 from utils.database.database import auth_with_password
 from utils.logger.logger import get_logger
 
@@ -6,19 +7,18 @@ logger = get_logger()
 
 def scrape() -> None:
     try:
-        requests.post(os.getenv('SCRAPER_URL') + '/scrape')
+        response = requests.post(os.getenv('SCRAPER_URL') + '/scrape')
+        response.raise_for_status()
     except Exception as e:
         logger.critical(f'Error with scrape(): {e}')
 
-def get_current_delay() -> int:
-    auth_token = auth_with_password(os.getenv('DB_URL'), os.getenv('DB_IDENTITY'), os.getenv('DB_PASSWORD'))
-    if auth_token is None:
-        return auth_token
+def get_current_delay() -> Optional[int]:
     try:
+        auth_token = auth_with_password(os.getenv('DB_URL'), os.getenv('DB_IDENTITY'), os.getenv('DB_PASSWORD'))
         response = requests.get(url=os.getenv('DB_URL') + '/api/collections/scraper_delay/records', 
-                                headers={'Authorization': auth_token}).json()
-        if response.get('totalItems') is None:
-            return None
+                                headers={'Authorization': auth_token})
+        response.raise_for_status()
+        response = response.json()
         response = response['items'][0]['scraper_delay']
     except Exception as e:
         logger.warning(f'Error with get_current_delay(): {e}')

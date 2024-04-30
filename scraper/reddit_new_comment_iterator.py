@@ -1,7 +1,9 @@
-import requests, logging, json
+import requests, json
 from urllib.parse import urlencode
 from bs4 import BeautifulSoup
+from utils.logger.logger import get_logger
 
+logger = get_logger()
 
 class RedditNewCommentIterator:
     def __init__(self, subreddit, query, proxy_url, api_key):
@@ -27,7 +29,7 @@ class RedditNewCommentIterator:
             response = response.text
             return response
         except requests.exceptions.HTTPError as err:
-            logging.warning('Error in \'__scrape__\'')
+            logger.warning('Error in \'__scrape__\'')
 
     def __iter__(self):
         return self
@@ -42,7 +44,7 @@ class RedditNewCommentIterator:
             comments = self.__format_comments__(soup)
             self.__reddit_partial_url = self.__get_next_reddit_partial_url__(soup)
         except:
-            logging.warning('Error in \'__next__\'')
+            logger.warning('Error in \'__next__\'')
         return comments
        
     def __format_comments__(self, soup):
